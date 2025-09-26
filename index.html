@@ -22,6 +22,10 @@
     .input-hours { width: 100%; max-width: 72px; } /* 요일 칸 */
     .input-wage  { width: 140px; }
     .nowrap { white-space: nowrap; }
+
+    /* ===== 모달 ===== */
+    .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:50; }
+    .modal.show { display:flex; }
   </style>
 </head>
 <body class="p-4 sm:p-6 flex items-center justify-center min-h-screen">
@@ -31,34 +35,32 @@
     <section class="card p-5 sm:p-7 mb-4">
       <div class="flex items-center justify-between gap-3">
         <h1 class="text-3xl sm:text-[2rem] font-extrabold leading-tight text-gray-900">최저임금 계산기</h1>
+        <!-- ✅ Ver 1.0 버튼 추가 -->
+        <button id="ver_btn" type="button" class="text-blue-600 font-semibold hover:text-blue-800 underline">Ver 1.0</button>
       </div>
     </section>
 
-    <!-- ✅ 제목 하단 배너 4개 -->
+    <!-- 제목 하단 배너 4개 -->
     <div class="px-4 sm:px-5 mb-5">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- 배너 1 -->
         <a href="https://www.kdrcash.kr/" target="_blank" rel="noopener noreferrer" class="block group">
           <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
             <img src="https://github.com/kdrcash/pay/blob/main/%EB%B3%91%EC%9D%98%EC%9B%90%20%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B6%84%EC%84%9D%20%ED%94%8C%EB%9E%AB%ED%8F%BC%20%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C.png?raw=true"
                  alt="닥터캐시" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
           </div>
         </a>
-        <!-- 배너 2 -->
         <a href="https://www.kdrcash.kr/" target="_blank" rel="noopener noreferrer" class="block group">
           <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
             <img src="https://github.com/kdrcash/pay/blob/main/%EB%B3%91%EC%9D%98%EC%9B%90%20%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B6%84%EC%84%9D%20%ED%94%8C%EB%9E%AB%ED%8F%BC%20%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C.png?raw=true"
                  alt="닥터캐시" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
           </div>
         </a>
-        <!-- 배너 3 -->
         <a href="https://www.kdrcash.kr/download" target="_blank" rel="noopener noreferrer" class="block group">
           <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
             <img src="https://github.com/kdrcash/pay/blob/main/%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C.png?raw=true"
                  alt="다운로드" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
           </div>
         </a>
-        <!-- 배너 4 -->
         <a href="https://www.kdrcash.kr/survey" target="_blank" rel="noopener noreferrer" class="block group">
           <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
             <img src="https://github.com/kdrcash/pay/blob/main/%EA%B0%9C%EC%9B%90%EA%B4%80%EB%A0%A8%20%ED%95%84%EC%88%98%EC%9E%90%EB%A3%8C%20%EB%AA%A8%EC%9D%8C.png?raw=true"
@@ -111,17 +113,15 @@
       </div>
     </section>
 
-    <!-- ✅ 푸터 위 배너 2개 -->
+    <!-- 푸터 위 배너 2개 -->
     <div class="px-4 sm:px-5 my-5">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- 배너 5 -->
         <a href="https://www.kdrcash.kr/download" target="_blank" rel="noopener noreferrer" class="block group">
           <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
             <img src="https://github.com/kdrcash/pay/blob/main/%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C.png?raw=true"
                  alt="다운로드" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
           </div>
         </a>
-        <!-- 배너 6 -->
         <a href="https://www.kdrcash.kr/survey" target="_blank" rel="noopener noreferrer" class="block group">
           <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
             <img src="https://github.com/kdrcash/pay/blob/main/%EA%B0%9C%EC%9B%90%EA%B4%80%EB%A0%A8%20%ED%95%84%EC%88%98%EC%9E%90%EB%A3%8C%20%EB%AA%A8%EC%9D%8C.png?raw=true"
@@ -131,13 +131,46 @@
       </div>
     </div>
 
-    <!-- ✅ 푸터 -->
+    <!-- 푸터 -->
     <section class="card p-4 text-center mt-4">
       <footer class="text-xs text-gray-500">© 2024 한국병의원데이터. All Rights Reserved</footer>
     </section>
   </main>
 
-  <!-- 스크립트 -->
+  <!-- ✅ Ver 1.0 모달 (세부설명) -->
+  <div id="ver_modal" class="modal">
+    <div class="absolute inset-0 bg-black/50"></div>
+    <div role="dialog" aria-modal="true"
+         class="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl p-6">
+      <div class="flex items-start justify-between mb-3">
+        <h3 class="text-lg font-bold text-gray-800">버전 1.0 • 계산 규칙</h3>
+        <button id="ver_close"
+                class="p-2 -m-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="닫기">✕</button>
+      </div>
+
+      <div class="text-sm text-gray-700 space-y-4">
+        <ul class="list-disc pl-5 space-y-1">
+          <li><b>주휴수당</b>은 주 15시간 이상 근무 시, 소정근로일을 개근해야 발생합니다.</li>
+          <li><b>주휴시간</b> = (주간 근로시간 ÷ 40) × 8 (최대 8시간)</li>
+          <li><b>주소정근로시간</b> = 주간 근로시간 + 주휴시간</li>
+          <li><b>월소정근로시간</b> = 주소정근로시간 × (365 ÷ 7 ÷ 12) → <b>소수점 올림</b></li>
+          <li><b>최저급여(세전)</b> = 월소정근로시간 × 최저시급</li>
+          <li><b>계약급여(세전)</b> = 월소정근로시간 × 계약시급</li>
+          <li>최저시급(2025) = <b>10,030원</b></li>
+        </ul>
+      </div>
+
+      <div class="mt-5 flex justify-end gap-2">
+        <button id="ver_ok"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          확인
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 스크립트 (계산 로직: 원본 그대로) ===== -->
   <script>
     const DAYS = 7;
     const tbody = document.getElementById('tbody');
@@ -230,6 +263,26 @@
     });
 
     document.getElementById('reset_rows').click();
+  </script>
+
+  <!-- ===== 모달 전용 스크립트 (계산 로직과 분리, 변경없음) ===== -->
+  <script>
+    const verBtn = document.getElementById('ver_btn');
+    const verModal = document.getElementById('ver_modal');
+    const verClose = document.getElementById('ver_close');
+    const verOk = document.getElementById('ver_ok');
+
+    function openVerModal(){ verModal.classList.add('show'); document.body.classList.add('overflow-hidden'); }
+    function closeVerModal(){ verModal.classList.remove('show'); document.body.classList.remove('overflow-hidden'); }
+
+    verBtn.addEventListener('click', openVerModal);
+    verClose.addEventListener('click', closeVerModal);
+    verOk.addEventListener('click', closeVerModal);
+    verModal.addEventListener('click', (e)=>{
+      const dialog = verModal.querySelector('[role="dialog"]');
+      if (dialog && !dialog.contains(e.target)) closeVerModal();
+    });
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeVerModal(); });
   </script>
 </body>
 </html>
