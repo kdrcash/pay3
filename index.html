@@ -11,13 +11,29 @@
     table { border-collapse: collapse; width:100%; font-size:14px; }
     th, td { border:1px solid #e5e7eb; padding:6px; text-align:center; white-space:nowrap; }
     th { background:#f9fafb; }
+
     .input-xl {
       border: 1px solid #d1d5db; border-radius: .5rem;
       padding: .5rem 1rem; min-height: 40px; text-align: right; width: 100%;
     }
-    .input-hours { width: 100%; max-width: 72px; }
     .input-wage  { width: 140px; }
     .nowrap { white-space: nowrap; }
+
+    /* ===== 시간 입력칸(요일) 스타일 ===== */
+    .hour-wrap { position: relative; display: inline-block; }
+    .input-hours {
+      width: 100%; max-width: 90px;
+      padding-right: 2rem;
+      border: 1px solid #d1d5db; border-radius: .5rem;
+      min-height: 40px; text-align: right;
+    }
+    .input-hours:focus { outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,.4) }
+    .hour-suffix {
+      position: absolute; right: .45rem; top: 50%; transform: translateY(-50%);
+      font-size: 12px; color: #9ca3af; pointer-events: none;
+    }
+
+    /* ===== 모달 ===== */
     .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:50; }
     .modal.show { display:flex; }
   </style>
@@ -33,39 +49,8 @@
       </div>
     </section>
 
-    <!-- 제목 하단 배너 4개 -->
-    <div class="px-4 sm:px-5 mb-5">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <a href="https://www.kdrcash.kr/" target="_blank" rel="noopener noreferrer" class="block group">
-          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-            <img src="https://github.com/kdrcash/pay/blob/main/%EB%B3%91%EC%9D%98%EC%9B%90%20%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B6%84%EC%84%9D%20%ED%94%8C%EB%9E%AB%ED%8F%BC%20%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C.png?raw=true"
-                 alt="닥터캐시" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
-          </div>
-        </a>
-        <a href="https://www.kdrcash.kr/" target="_blank" rel="noopener noreferrer" class="block group">
-          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-            <img src="https://github.com/kdrcash/pay/blob/main/%EB%B3%91%EC%9D%98%EC%9B%90%20%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B6%84%EC%84%9D%20%ED%94%8C%EB%9E%AB%ED%8F%BC%20%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C.png?raw=true"
-                 alt="닥터캐시" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
-          </div>
-        </a>
-        <a href="https://www.kdrcash.kr/download" target="_blank" rel="noopener noreferrer" class="block group">
-          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-            <img src="https://github.com/kdrcash/pay/blob/main/%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C.png?raw=true"
-                 alt="다운로드" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
-          </div>
-        </a>
-        <a href="https://www.kdrcash.kr/survey" target="_blank" rel="noopener noreferrer" class="block group">
-          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-            <img src="https://github.com/kdrcash/pay/blob/main/%EA%B0%9C%EC%9B%90%EA%B4%80%EB%A0%A8%20%ED%95%84%EC%88%98%EC%9E%90%EB%A3%8C%20%EB%AA%A8%EC%9D%8C.png?raw=true"
-                 alt="개원 필수자료 모음" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
-          </div>
-        </a>
-      </div>
-    </div>
-
-    <!-- 본문 계산기 -->
+    <!-- 시급 입력란 -->
     <section class="card p-6 mb-6">
-      <!-- 시급 입력란 (세 칸 / 안내문구 중앙정렬 + 고정폭 정렬 보정) -->
       <div class="flex gap-6 mb-4 flex-wrap">
         <!-- 최저시급 -->
         <div class="flex flex-col gap-2">
@@ -74,36 +59,27 @@
             <input id="min_wage" type="text" value="10,030"
                    class="input-xl input-wage focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
-          <!-- 최저시급 안내 -->
-          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">
-            2025년 기준
-          </p>
+          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">2025년 기준</p>
         </div>
 
-        <!-- 계약시급 (왼쪽: 별도) -->
+        <!-- 계약시급 (별도) -->
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2">
             <label class="text-sm font-semibold text-gray-700">계약시급 (원)</label>
             <input id="contract_wage" type="text" value="15,000"
                    class="input-xl input-wage focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
-          <!-- 계약시급(별도) 안내 -->
-          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">
-            주휴수당 별도
-          </p>
+          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">주휴수당 별도</p>
         </div>
 
-        <!-- 계약시급 (오른쪽: 포함) -->
+        <!-- 계약시급 (포함) -->
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2">
             <label class="text-sm font-semibold text-gray-700">계약시급 (원)</label>
             <input id="contract_wage2" type="text" value="15,000"
                    class="input-xl input-wage focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
-          <!-- 계약시급(포함) 안내 -->
-          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">
-            주휴수당 포함
-          </p>
+          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">주휴수당 포함</p>
         </div>
       </div>
 
@@ -134,24 +110,6 @@
       </div>
     </section>
 
-    <!-- 푸터 위 배너 2개 -->
-    <div class="px-4 sm:px-5 my-5">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <a href="https://www.kdrcash.kr/download" target="_blank" rel="noopener noreferrer" class="block group">
-          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-            <img src="https://github.com/kdrcash/pay/blob/main/%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C.png?raw=true"
-                 alt="다운로드" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
-          </div>
-        </a>
-        <a href="https://www.kdrcash.kr/survey" target="_blank" rel="noopener noreferrer" class="block group">
-          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-            <img src="https://github.com/kdrcash/pay/blob/main/%EA%B0%9C%EC%9B%90%EA%B4%80%EB%A0%A8%20%ED%95%84%EC%88%98%EC%9E%90%EB%A3%8C%20%EB%AA%A8%EC%9D%8C.png?raw=true"
-                 alt="개원 필수자료 모음" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
-          </div>
-        </a>
-      </div>
-    </div>
-
     <!-- 푸터 -->
     <section class="card p-4 text-center mt-4">
       <footer class="text-xs text-gray-500">© 2024 한국병의원데이터. All Rights Reserved</footer>
@@ -171,13 +129,14 @@
       </div>
       <div class="text-sm text-gray-700 space-y-4">
         <ul class="list-disc pl-5 space-y-1">
-          <li><b>주휴수당</b>은 <b>주 15시간 이상</b> 근무 시, 소정근로일을 개근 시 발생</li>
+          <li><b>주휴수당</b>은 <b>주 15시간 이상</b> 근무 시, 소정근로일 개근 시 발생</li>
           <li><b>주휴시간</b> = (주간 근로시간 ÷ 40) × 8 (최대 8시간)</li>
           <li><b>주소정근로시간</b> = 주간 근로시간 + 주휴시간</li>
           <li><b>월소정근로시간</b> = 주소정근로시간 × (365 ÷ 7 ÷ 12)</li>
           <li><b>최저급여(세전)</b> = 월소정근로시간 × 최저시급</li>
           <li><b>계약급여(세전)</b> = 월소정근로시간 × 계약시급</li>
           <li>최저시급(2025) = <b>10,030원</b></li>
+          <li class="text-gray-500">* 시급 연동(별도↔포함)은 1안 기준으로 계산됩니다.</li>
         </ul>
       </div>
       <div class="mt-5 flex justify-end gap-2">
@@ -191,18 +150,18 @@
 
   <!-- 스크립트 -->
   <script>
-    // 공통
     const nf = new Intl.NumberFormat('ko-KR');
     const onlyNumber = s => (s ?? '').toString().replace(/[^\d]/g,'');
     const toInt = s => parseFloat(onlyNumber(s)) || 0;
 
-    // DOM
     const tbody = document.getElementById('tbody');
     const minInput = document.getElementById('min_wage');
-    const conInput = document.getElementById('contract_wage');   // 계산에 사용
-    const conInput2 = document.getElementById('contract_wage2'); // 표시용, 계산 미사용
+    const conInput = document.getElementById('contract_wage');   // 주휴 별도
+    const conInput2 = document.getElementById('contract_wage2'); // 주휴 포함
 
-    // 쉼표 입력 바인딩
+    let isSyncing = false;
+    let lastEdited = 'excluded'; // 최근 수정 방향
+
     function bindComma(input){
       input.addEventListener('input', (e)=>{
         const raw = onlyNumber(e.target.value);
@@ -214,14 +173,19 @@
     }
     [minInput, conInput, conInput2].forEach(bindComma);
 
-    // 행 생성
     const DAYS = 7;
-    function rowHtml(idx){
-      const dayInputs = Array.from({length:DAYS}).map((_,i)=>`
+    function dayCell(defaultVal){
+      return `
         <td>
-          <input type="text" inputmode="decimal" value="${i<5?8:''}"
-                 class="input-xl input-hours focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </td>`).join('');
+          <div class="hour-wrap">
+            <input type="text" inputmode="decimal" value="${defaultVal}"
+                   class="input-hours">
+            <span class="hour-suffix">시간</span>
+          </div>
+        </td>`;
+    }
+    function rowHtml(idx){
+      const dayInputs = Array.from({length:DAYS}).map((_,i)=>dayCell(i<5 ? 8 : '')).join('');
       return `<tr>
         <td>${idx+1}안</td>${dayInputs}
         <td class="weeklyHoliday"></td>
@@ -233,7 +197,6 @@
     }
     function addRow(idx){ tbody.insertAdjacentHTML('beforeend', rowHtml(idx)); }
 
-    // 입력 처리(소수점 1개 허용)
     tbody.addEventListener('input', (e)=>{
       if(!(e.target instanceof HTMLInputElement)) return;
       if(!e.target.classList.contains('input-hours')) return;
@@ -245,7 +208,6 @@
       autoCalc();
     });
 
-    // 계산(기존 로직 유지)
     function weeklyCalc(dayHours){
       const workdays = dayHours.filter(h=>h>0.0001).length;
       const weeklyHours = dayHours.reduce((a,b)=>a+b,0);
@@ -253,8 +215,9 @@
       const weeklyHoliday = eligible ? Math.min((weeklyHours/40)*8,8) : 0;
       const weeklyStd = weeklyHours + weeklyHoliday;
       const monthlyStd = Math.ceil(weeklyStd * (365/7/12));
-      return { weeklyHoliday, weeklyStd, monthlyStd };
+      return { weeklyHours, weeklyHoliday, weeklyStd, monthlyStd };
     }
+
     function calcRow(tr, minWage, conWage){
       const hours = Array.from(tr.querySelectorAll('input.input-hours')).map(inp=>parseFloat(inp.value)||0);
       const { weeklyHoliday, weeklyStd, monthlyStd } = weeklyCalc(hours);
@@ -266,25 +229,81 @@
       tr.querySelector('.minGross').textContent      = (minGross?nf.format(minGross):0) + ' 원';
       tr.querySelector('.conGross').textContent      = (conGross?nf.format(conGross):0) + ' 원';
     }
+
+    function getRefRow(){ return tbody.rows[0] || null; }
+
+    function refStats(){
+      const tr = getRefRow();
+      if(!tr) return { monthlyStd:0, monthlyStdNH:0 };
+      const hours = Array.from(tr.querySelectorAll('input.input-hours')).map(inp=>parseFloat(inp.value)||0);
+      const { weeklyHours, monthlyStd } = weeklyCalc(hours);
+      const monthlyStdNH = Math.ceil(weeklyHours * 4.345); // 정수 올림 적용
+      return { monthlyStd, monthlyStdNH };
+    }
+
+    function syncIncludedFromExcluded(){
+      if(isSyncing) return;
+      isSyncing = true;
+      const { monthlyStd, monthlyStdNH } = refStats();
+      const excluded = toInt(conInput.value);
+      if(monthlyStd > 0 && monthlyStdNH > 0 && excluded > 0){
+        const contractGross = monthlyStd * excluded;
+        const included = Math.round(contractGross / monthlyStdNH);
+        conInput2.value = included ? nf.format(included) : '';
+      }
+      isSyncing = false;
+    }
+
+    function syncExcludedFromIncluded(){
+      if(isSyncing) return;
+      isSyncing = true;
+      const { monthlyStd, monthlyStdNH } = refStats();
+      const included = toInt(conInput2.value);
+      if(monthlyStd > 0 && monthlyStdNH > 0 && included > 0){
+        const contractGross = monthlyStdNH * included;
+        const excluded = Math.round(contractGross / monthlyStd);
+        conInput.value = excluded ? nf.format(excluded) : '';
+        autoCalc();
+      }
+      isSyncing = false;
+    }
+
     function autoCalc(){
       const minWage = toInt(minInput.value);
       const conWage = toInt(conInput.value);
       Array.from(tbody.rows).forEach(tr=>calcRow(tr, minWage, conWage));
+      if(lastEdited === 'excluded'){
+        syncIncludedFromExcluded();
+      }else{
+        syncExcludedFromIncluded();
+      }
     }
 
-    // 컨트롤
-    document.getElementById('add_row').addEventListener('click', ()=>{ addRow(tbody.rows.length); autoCalc(); });
+    document.getElementById('add_row').addEventListener('click', ()=>{
+      addRow(tbody.rows.length);
+      autoCalc();
+    });
+
     function resetAll(){
       tbody.innerHTML=''; for(let i=0;i<3;i++) addRow(i);
       minInput.value = nf.format(10030);
-      conInput.value = nf.format(15000);
-      conInput2.value = nf.format(15000);
+      conInput.value = nf.format(10030);
+      conInput2.value = nf.format(10030);
+      lastEdited = 'excluded';
       autoCalc();
     }
     document.getElementById('reset_rows').addEventListener('click', resetAll);
     resetAll();
 
-    // 모달
+    conInput.addEventListener('input', ()=>{
+      lastEdited = 'excluded';
+      syncIncludedFromExcluded();
+    });
+    conInput2.addEventListener('input', ()=>{
+      lastEdited = 'included';
+      syncExcludedFromIncluded();
+    });
+
     const verBtn = document.getElementById('ver_btn');
     const verModal = document.getElementById('ver_modal');
     const verClose = document.getElementById('ver_close');
@@ -294,7 +313,10 @@
     verBtn.addEventListener('click', openVerModal);
     verClose.addEventListener('click', closeVerModal);
     verOk.addEventListener('click', closeVerModal);
-    verModal.addEventListener('click', (e)=>{ const dialog = verModal.querySelector('[role="dialog"]'); if(dialog && !dialog.contains(e.target)) closeVerModal(); });
+    verModal.addEventListener('click', (e)=>{
+      const dialog = verModal.querySelector('[role="dialog"]');
+      if(dialog && !dialog.contains(e.target)) closeVerModal();
+    });
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeVerModal(); });
   </script>
 </body>
