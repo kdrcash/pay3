@@ -19,7 +19,7 @@
     .input-wage  { width: 140px; }
     .nowrap { white-space: nowrap; }
 
-    /* ===== 시간 입력칸(요일) 스타일 ===== */
+    /* 시간 입력칸(요일) */
     .hour-wrap { position: relative; display: inline-block; }
     .input-hours {
       width: 100%; max-width: 90px;
@@ -33,7 +33,7 @@
       font-size: 12px; color: #9ca3af; pointer-events: none;
     }
 
-    /* ===== 모달 ===== */
+    /* 모달 */
     .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:50; }
     .modal.show { display:flex; }
   </style>
@@ -49,8 +49,39 @@
       </div>
     </section>
 
-    <!-- 시급 입력란 -->
+    <!-- 제목 하단 배너 4개 -->
+    <div class="px-4 sm:px-5 mb-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <a href="https://www.kdrcash.kr/" target="_blank" rel="noopener noreferrer" class="block group">
+          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+            <img src="https://github.com/kdrcash/pay/blob/main/%EB%B3%91%EC%9D%98%EC%9B%90%20%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B6%84%EC%84%9D%20%ED%94%8C%EB%9E%AB%ED%8F%BC%20%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C.png?raw=true"
+                 alt="닥터캐시" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
+          </div>
+        </a>
+        <a href="https://www.kdrcash.kr/" target="_blank" rel="noopener noreferrer" class="block group">
+          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+            <img src="https://github.com/kdrcash/pay/blob/main/%EB%B3%91%EC%9D%98%EC%9B%90%20%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B6%84%EC%84%9D%20%ED%94%8C%EB%9E%AB%ED%8F%BC%20%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C.png?raw=true"
+                 alt="닥터캐시" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
+          </div>
+        </a>
+        <a href="https://www.kdrcash.kr/download" target="_blank" rel="noopener noreferrer" class="block group">
+          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+            <img src="https://github.com/kdrcash/pay/blob/main/%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C.png?raw=true"
+                 alt="다운로드" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
+          </div>
+        </a>
+        <a href="https://www.kdrcash.kr/survey" target="_blank" rel="noopener noreferrer" class="block group">
+          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+            <img src="https://github.com/kdrcash/pay/blob/main/%EA%B0%9C%EC%9B%90%EA%B4%80%EB%A0%A8%20%ED%95%84%EC%88%98%EC%9E%90%EB%A3%8C%20%EB%AA%A8%EC%9D%8C.png?raw=true"
+                 alt="개원 필수자료 모음" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- 본문 계산기 -->
     <section class="card p-6 mb-6">
+      <!-- 시급 입력란 -->
       <div class="flex gap-6 mb-4 flex-wrap">
         <!-- 최저시급 -->
         <div class="flex flex-col gap-2">
@@ -66,7 +97,7 @@
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2">
             <label class="text-sm font-semibold text-gray-700">계약시급 (원)</label>
-            <input id="contract_wage" type="text" value="15,000"
+            <input id="contract_wage" type="text" value="10,030"
                    class="input-xl input-wage focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
           <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">주휴수당 별도</p>
@@ -76,7 +107,7 @@
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2">
             <label class="text-sm font-semibold text-gray-700">계약시급 (원)</label>
-            <input id="contract_wage2" type="text" value="15,000"
+            <input id="contract_wage2" type="text" value="10,030"
                    class="input-xl input-wage focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
           <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">주휴수당 포함</p>
@@ -110,6 +141,24 @@
       </div>
     </section>
 
+    <!-- 푸터 위 배너 2개 -->
+    <div class="px-4 sm:px-5 my-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <a href="https://www.kdrcash.kr/download" target="_blank" rel="noopener noreferrer" class="block group">
+          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+            <img src="https://github.com/kdrcash/pay/blob/main/%EB%8B%A5%ED%84%B0%EC%BA%90%EC%8B%9C%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C.png?raw=true"
+                 alt="다운로드" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
+          </div>
+        </a>
+        <a href="https://www.kdrcash.kr/survey" target="_blank" rel="noopener noreferrer" class="block group">
+          <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+            <img src="https://github.com/kdrcash/pay/blob/main/%EA%B0%9C%EC%9B%90%EA%B4%80%EB%A0%A8%20%ED%95%84%EC%88%98%EC%9E%90%EB%A3%8C%20%EB%AA%A8%EC%9D%8C.png?raw=true"
+                 alt="개원 필수자료 모음" class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
+          </div>
+        </a>
+      </div>
+    </div>
+
     <!-- 푸터 -->
     <section class="card p-4 text-center mt-4">
       <footer class="text-xs text-gray-500">© 2024 한국병의원데이터. All Rights Reserved</footer>
@@ -136,7 +185,7 @@
           <li><b>최저급여(세전)</b> = 월소정근로시간 × 최저시급</li>
           <li><b>계약급여(세전)</b> = 월소정근로시간 × 계약시급</li>
           <li>최저시급(2025) = <b>10,030원</b></li>
-          <li class="text-gray-500">* 시급 연동(별도↔포함)은 1안 기준으로 계산됩니다.</li>
+          <li class="text-gray-500">시급 연동(별도↔포함)은 1안 기준으로 계산됩니다.</li>
         </ul>
       </div>
       <div class="mt-5 flex justify-end gap-2">
@@ -150,18 +199,22 @@
 
   <!-- 스크립트 -->
   <script>
+    // 유틸
     const nf = new Intl.NumberFormat('ko-KR');
     const onlyNumber = s => (s ?? '').toString().replace(/[^\d]/g,'');
     const toInt = s => parseFloat(onlyNumber(s)) || 0;
 
+    // DOM
     const tbody = document.getElementById('tbody');
     const minInput = document.getElementById('min_wage');
-    const conInput = document.getElementById('contract_wage');   // 주휴 별도
-    const conInput2 = document.getElementById('contract_wage2'); // 주휴 포함
+    const conInput = document.getElementById('contract_wage');   // 주휴 별도 (계산에 사용)
+    const conInput2 = document.getElementById('contract_wage2'); // 주휴 포함 (연동 표시/입력)
 
-    let isSyncing = false;
-    let lastEdited = 'excluded'; // 최근 수정 방향
+    // 연동 상태 제어
+    let isSyncing = false;       // 프로그램적 업데이트 루프 방지
+    let lastEdited = 'excluded'; // 'excluded' | 'included'
 
+    // 쉼표 입력 & 즉시 계산(필요 대상만)
     function bindComma(input){
       input.addEventListener('input', (e)=>{
         const raw = onlyNumber(e.target.value);
@@ -173,6 +226,7 @@
     }
     [minInput, conInput, conInput2].forEach(bindComma);
 
+    // 행 생성
     const DAYS = 7;
     function dayCell(defaultVal){
       return `
@@ -197,6 +251,7 @@
     }
     function addRow(idx){ tbody.insertAdjacentHTML('beforeend', rowHtml(idx)); }
 
+    // 시간 입력(소수점 1개 허용)
     tbody.addEventListener('input', (e)=>{
       if(!(e.target instanceof HTMLInputElement)) return;
       if(!e.target.classList.contains('input-hours')) return;
@@ -208,16 +263,18 @@
       autoCalc();
     });
 
+    // 주/월 시간 계산
     function weeklyCalc(dayHours){
       const workdays = dayHours.filter(h=>h>0.0001).length;
       const weeklyHours = dayHours.reduce((a,b)=>a+b,0);
       const eligible = weeklyHours>=15 && workdays>0;
       const weeklyHoliday = eligible ? Math.min((weeklyHours/40)*8,8) : 0;
       const weeklyStd = weeklyHours + weeklyHoliday;
-      const monthlyStd = Math.ceil(weeklyStd * (365/7/12));
+      const monthlyStd = Math.ceil(weeklyStd * (365/7/12)); // 주휴 포함 기준 월소정근로시간(정수 올림)
       return { weeklyHours, weeklyHoliday, weeklyStd, monthlyStd };
     }
 
+    // 표 행 계산
     function calcRow(tr, minWage, conWage){
       const hours = Array.from(tr.querySelectorAll('input.input-hours')).map(inp=>parseFloat(inp.value)||0);
       const { weeklyHoliday, weeklyStd, monthlyStd } = weeklyCalc(hours);
@@ -230,17 +287,18 @@
       tr.querySelector('.conGross').textContent      = (conGross?nf.format(conGross):0) + ' 원';
     }
 
+    // 1안(첫 행) 기준 연동용 값
     function getRefRow(){ return tbody.rows[0] || null; }
-
     function refStats(){
       const tr = getRefRow();
       if(!tr) return { monthlyStd:0, monthlyStdNH:0 };
       const hours = Array.from(tr.querySelectorAll('input.input-hours')).map(inp=>parseFloat(inp.value)||0);
       const { weeklyHours, monthlyStd } = weeklyCalc(hours);
-      const monthlyStdNH = Math.ceil(weeklyHours * 4.345); // 정수 올림 적용
+      const monthlyStdNH = Math.ceil(weeklyHours * 4.345); // 별도로 계산된 월소정근로시간(정수 올림)
       return { monthlyStd, monthlyStdNH };
     }
 
+    // 별도 → 포함
     function syncIncludedFromExcluded(){
       if(isSyncing) return;
       isSyncing = true;
@@ -254,6 +312,7 @@
       isSyncing = false;
     }
 
+    // 포함 → 별도
     function syncExcludedFromIncluded(){
       if(isSyncing) return;
       isSyncing = true;
@@ -263,15 +322,18 @@
         const contractGross = monthlyStdNH * included;
         const excluded = Math.round(contractGross / monthlyStd);
         conInput.value = excluded ? nf.format(excluded) : '';
-        autoCalc();
+        autoCalc(); // 별도시급이 실제 계산에 사용되므로 재계산
       }
       isSyncing = false;
     }
 
+    // 전체 재계산
     function autoCalc(){
       const minWage = toInt(minInput.value);
       const conWage = toInt(conInput.value);
       Array.from(tbody.rows).forEach(tr=>calcRow(tr, minWage, conWage));
+
+      // 최근 편집 방향에 따라 동기화
       if(lastEdited === 'excluded'){
         syncIncludedFromExcluded();
       }else{
@@ -279,6 +341,7 @@
       }
     }
 
+    // 컨트롤
     document.getElementById('add_row').addEventListener('click', ()=>{
       addRow(tbody.rows.length);
       autoCalc();
@@ -295,6 +358,7 @@
     document.getElementById('reset_rows').addEventListener('click', resetAll);
     resetAll();
 
+    // 시급 입력 방향 설정
     conInput.addEventListener('input', ()=>{
       lastEdited = 'excluded';
       syncIncludedFromExcluded();
@@ -304,6 +368,7 @@
       syncExcludedFromIncluded();
     });
 
+    // 모달
     const verBtn = document.getElementById('ver_btn');
     const verModal = document.getElementById('ver_modal');
     const verClose = document.getElementById('ver_close');
