@@ -122,12 +122,12 @@
         <!-- 비과세 합계(월) -->
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2">
-            <label class="text-sm font-semibold text-gray-700">비과세 (월)</label>
+            <label class="text-sm font-semibold text-gray-700">비과세(월)</label>
             <input id="nontax_monthly" type="text" value="0"
                    class="input-xl input-wage focus:outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="200,000">
+                   placeholder="식대/자가운전 등">
           </div>
-          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">식대/자가운전 등</p>
+          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">소득세·4대보험 산정에서 제외</p>
         </div>
       </div>
 
@@ -258,7 +258,7 @@
       function setStatus(text, style='loading'){
         if(!tableStatusEl) return;
         tableStatusEl.textContent = '세액표: ' + text;
-        tableStatusEl.className = 'badge'; // reset
+        tableStatusEl.className = 'badge';
         if(style==='ok') tableStatusEl.classList.add('text-green-700','border-green-300','bg-green-50');
         else if(style==='error') tableStatusEl.classList.add('text-red-700','border-red-300','bg-red-50');
         else tableStatusEl.classList.add('text-gray-700','border-gray-300','bg-gray-50');
@@ -278,7 +278,7 @@
         TAX_TABLE.sort((a,b)=>a.min_won-b.min_won);
         tableReady = true;
         setStatus('로드 완료','ok');
-        autoCalc(); // 로드 직후 세후값 갱신
+        autoCalc(); // 로드 직후 세후 갱신
       }catch(e){
         tableReady = false;
         setStatus('로드 실패', 'error');
@@ -422,7 +422,7 @@
       const minGross_o5 = monthlyStd_o5 * minWage;
       const conGross_o5 = monthlyStd_o5 * conWage;
 
-      // ✅ 세후 계산 규칙
+      // 세후 계산 규칙
       // 최저급여(세후): 비과세 0원 가정
       const d_min_u5 = employeeDeductionsUsingTable(minGross_u5, 0);
       const d_min_o5 = employeeDeductionsUsingTable(minGross_o5, 0);
@@ -457,42 +457,43 @@
       setGrossCell('.conGross_o5', conGross_o5, conNet_o5);
     }
 
+    // 1안(첫 행) 기준 연동 값
     function getRefRow(){ return tbody.rows[0] || null; }
     function refStats(){
       const tr = getRefRow();
       if(!tr) return { monthlyStd:0, monthlyStdNH:0 };
       const hours = Array.from(tr.querySelectorAll('input.input-hours')).map(inp=>parseFloat(inp.value)||0);
       const weeklyHours = hours.reduce((a,b)=>a+b,0);
-      const weeklyHoliday = weeklyHours>=15 && hours.filter(h=>h>0).length>0 ? Math.min((weeklyHours/40)*8,8) : 0;
+      const weeklyHoliday = weeklyHours>=15 && hours.some(h=>h>0) ? Math.min((weeklyHours/40)*8,8) : 0;
       const weeklyStd = weeklyHours + weeklyHoliday;
-      const monthlyStd = Math.ceil(weeklyStd * MONTH_FACTOR);
-      const monthlyStdNH = Math.ceil(weeklyHours * 4.345);
+      const monthlyStd = Math.ceil(weeklyStd * MONTH_FACTOR); // 주휴 포함
+      const monthlyStdNH = Math.ceil(weeklyHours * 4.345);    // 주휴 제외
       return { monthlyStd, monthlyStdNH };
     }
 
+    // 별도 → 포함 (정상)
     function syncIncludedFromExcluded(){
       if(isSyncing) return;
       isSyncing = true;
       const { monthlyStd, monthlyStdNH } = refStats();
-      const excluded = toInt(conInput.value);
+      const excluded = toInt(conInput.value); // 주휴 별도 시급
       if(monthlyStd > 0 && monthlyStdNH > 0 && excluded > 0){
-        const contractGross = monthlyStd * excluded;
-        const included = Math.round(contractGross / monthlyStdNH);
+        const included = Math.round((monthlyStd * excluded) / monthlyStdNH);
         conInput2.value = included ? nf.format(included) : '';
       }
       isSyncing = false;
     }
 
+    // 포함 → 별도 (★ 버그 수정: 주휴 제외 시간 사용)
     function syncExcludedFromIncluded(){
       if(isSyncing) return;
       isSyncing = true;
-      const { monthlyStd } = refStats();
-      const included = toInt(conInput2.value);
-      if(monthlyStd > 0 && included > 0){
-        const contractGross = monthlyStd * included;
-        const excluded = Math.round(contractGross / monthlyStd);
+      const { monthlyStd, monthlyStdNH } = refStats();
+      const included = toInt(conInput2.value); // 주휴 포함 시급
+      if(monthlyStd > 0 && monthlyStdNH > 0 && included > 0){
+        const excluded = Math.round((monthlyStdNH * included) / monthlyStd);
         conInput.value = excluded ? nf.format(excluded) : '';
-        autoCalc();
+        autoCalc(); // 실제 계산에 별도시급 사용
       }
       isSyncing = false;
     }
@@ -529,6 +530,7 @@
     document.getElementById('reset_rows').addEventListener('click', resetAll);
     resetAll();
 
+    // 편집 방향 플래그 관리
     conInput.addEventListener('input', ()=>{
       lastEdited = 'excluded';
       syncIncludedFromExcluded();
