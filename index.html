@@ -45,7 +45,7 @@
     <section class="card p-5 sm:p-7 mb-4">
       <div class="flex items-center justify-between gap-3">
         <h1 class="text-3xl sm:text-[2rem] font-extrabold leading-tight text-gray-900">최저임금 계산기</h1>
-        <button id="ver_btn" type="button" class="text-blue-600 font-semibold hover:text-blue-800 underline">Ver 1.0</button>
+        <button id="ver_btn" type="button" class="text-blue-600 font-semibold hover:text-blue-800 underline">Ver 1.1</button>
       </div>
     </section>
 
@@ -93,7 +93,7 @@
           <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">2025년 기준</p>
         </div>
 
-        <!-- 계약시급 (별도) -->
+        <!-- 계약시급 (주휴 별도) -->
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2">
             <label class="text-sm font-semibold text-gray-700">계약시급 (원)</label>
@@ -103,7 +103,7 @@
           <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">주휴수당 별도</p>
         </div>
 
-        <!-- 계약시급 (포함) -->
+        <!-- 계약시급 (주휴 포함 환산 표시) -->
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2">
             <label class="text-sm font-semibold text-gray-700">계약시급 (원)</label>
@@ -124,16 +124,19 @@
 
       <!-- 근로시간표 -->
       <div class="overflow-x-auto">
-        <table id="hours_table" class="min-w-[1200px]">
+        <table id="hours_table" class="min-w-[1600px]">
           <thead>
             <tr>
-              <th>구분</th>
+              <th rowspan="2">구분</th>
+              <th colspan="7">요일별 근무시간(시간)</th>
+              <th rowspan="2">주휴시간</th>
+              <th colspan="4">5인 미만</th>
+              <th colspan="4">5인 이상</th>
+            </tr>
+            <tr>
               <th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th><th>일</th>
-              <th>주휴시간</th>
-              <th>주소정근로시간</th>
-              <th>월소정근로시간</th>
-              <th>최저급여(세전)</th>
-              <th>계약급여(세전)</th>
+              <th>주소정</th><th>월소정</th><th>최저급여</th><th>계약급여</th>
+              <th>주소정</th><th>월소정</th><th>최저급여</th><th>계약급여</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -165,27 +168,33 @@
     </section>
   </main>
 
-  <!-- Ver 1.0 모달 -->
+  <!-- Ver 1.1 모달 -->
   <div id="ver_modal" class="modal">
     <div class="absolute inset-0 bg-black/50"></div>
     <div role="dialog" aria-modal="true"
          class="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl p-6">
       <div class="flex items-start justify-between mb-3">
-        <h3 class="text-lg font-bold text-gray-800">버전 1.0 • 계산 규칙</h3>
+        <h3 class="text-lg font-bold text-gray-800">버전 1.1 • 계산 규칙</h3>
         <button id="ver_close"
                 class="p-2 -m-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-label="닫기">✕</button>
       </div>
       <div class="text-sm text-gray-700 space-y-4">
         <ul class="list-disc pl-5 space-y-1">
-          <li><b>주휴수당</b>은 <b>주 15시간 이상</b> 근무 시, 소정근로일 개근 시 발생</li>
+          <li><b>주휴수당</b>: 주 15시간 이상 근무 & 소정근로일 개근 시 발생</li>
           <li><b>주휴시간</b> = (주간 근로시간 ÷ 40) × 8 (최대 8시간)</li>
-          <li><b>주소정근로시간</b> = 주간 근로시간 + 주휴시간</li>
-          <li><b>월소정근로시간</b> = 주소정근로시간 × (365 ÷ 7 ÷ 12)</li>
-          <li><b>최저급여(세전)</b> = 월소정근로시간 × 최저시급</li>
-          <li><b>계약급여(세전)</b> = 월소정근로시간 × 계약시급</li>
+          <li><b>주소정(5인 미만)</b> = 주간 근로시간 + 주휴시간</li>
+          <li><b>주소정(5인 이상)</b> = 
+            <span class="whitespace-pre-line">
+- 일별 초과합 = Σ max(0, h-8)
+- 주40 초과 = max(0, 주간총시간-40)
+- 프리미엄 = 0.5 × max(일별 초과합, 주40 초과)
+- 가산반영 주간근로 = 주간총시간 + 프리미엄
+- 최종 주소정 = 가산반영 주간근로 + 주휴시간</span></li>
+          <li><b>월소정</b> = 주소정 × (365 ÷ 7 ÷ 12) (정수 올림)</li>
+          <li><b>최저급여</b> = 월소정 × 최저시급, <b>계약급여</b> = 월소정 × 계약시급</li>
           <li>최저시급(2025) = <b>10,030원</b></li>
-          <li class="text-gray-500">시급 연동(별도↔포함)은 1안 기준으로 계산됩니다.</li>
+          <li class="text-gray-500">시급 연동(별도↔포함)은 1안(첫 행) 기준으로 계산됩니다.</li>
         </ul>
       </div>
       <div class="mt-5 flex justify-end gap-2">
@@ -203,6 +212,7 @@
     const nf = new Intl.NumberFormat('ko-KR');
     const onlyNumber = s => (s ?? '').toString().replace(/[^\d]/g,'');
     const toInt = s => parseFloat(onlyNumber(s)) || 0;
+    const MONTH_FACTOR = 365/7/12; // ≈ 4.345
 
     // DOM
     const tbody = document.getElementById('tbody');
@@ -211,7 +221,7 @@
     const conInput2 = document.getElementById('contract_wage2'); // 주휴 포함 (연동 표시/입력)
 
     // 연동 상태 제어
-    let isSyncing = false;       // 프로그램적 업데이트 루프 방지
+    let isSyncing = false;
     let lastEdited = 'excluded'; // 'excluded' | 'included'
 
     // 쉼표 입력 & 즉시 계산(필요 대상만)
@@ -243,10 +253,18 @@
       return `<tr>
         <td>${idx+1}안</td>${dayInputs}
         <td class="weeklyHoliday"></td>
-        <td class="weeklyStd"></td>
-        <td class="monthlyStd"></td>
-        <td class="minGross nowrap"></td>
-        <td class="conGross nowrap"></td>
+
+        <!-- 5인 미만 -->
+        <td class="weeklyStd_u5"></td>
+        <td class="monthlyStd_u5"></td>
+        <td class="minGross_u5 nowrap"></td>
+        <td class="conGross_u5 nowrap"></td>
+
+        <!-- 5인 이상 -->
+        <td class="weeklyStd_o5"></td>
+        <td class="monthlyStd_o5"></td>
+        <td class="minGross_o5 nowrap"></td>
+        <td class="conGross_o5 nowrap"></td>
       </tr>`;
     }
     function addRow(idx){ tbody.insertAdjacentHTML('beforeend', rowHtml(idx)); }
@@ -263,43 +281,85 @@
       autoCalc();
     });
 
-    // 주/월 시간 계산
-    function weeklyCalc(dayHours){
+    // 주/월 시간 계산 (5인 미만 + 5인 이상)
+    function weeklyCalcSplit(dayHours){
       const workdays = dayHours.filter(h=>h>0.0001).length;
       const weeklyHours = dayHours.reduce((a,b)=>a+b,0);
+
+      // 주휴시간 (공통)
       const eligible = weeklyHours>=15 && workdays>0;
       const weeklyHoliday = eligible ? Math.min((weeklyHours/40)*8,8) : 0;
-      const weeklyStd = weeklyHours + weeklyHoliday;
-      const monthlyStd = Math.ceil(weeklyStd * (365/7/12)); // 주휴 포함 기준 월소정근로시간(정수 올림)
-      return { weeklyHours, weeklyHoliday, weeklyStd, monthlyStd };
+
+      // 5인 미만: 주간 표준 = 주간 총시간 + 주휴
+      const weeklyStd_u5 = weeklyHours + weeklyHoliday;
+
+      // 5인 이상: 개선 로직
+      // 일별 초과합(>8h), 주40 초과를 각각 계산 후 프리미엄 = 0.5 * max(일별초과합, 주40초과)
+      const dailyOver = dayHours.reduce((s,h)=> s + Math.max(0, h - 8), 0);
+      const weeklyOver = Math.max(0, weeklyHours - 40);
+      const premium = 0.5 * Math.max(dailyOver, weeklyOver);
+
+      // 가산 반영 주간 근로시간 + 주휴
+      const adjustedWork_o5 = weeklyHours + premium;
+      const weeklyStd_o5 = adjustedWork_o5 + weeklyHoliday;
+
+      // 월 소정(정수 올림)
+      const monthlyStd_u5 = Math.ceil(weeklyStd_u5 * MONTH_FACTOR);
+      const monthlyStd_o5 = Math.ceil(weeklyStd_o5 * MONTH_FACTOR);
+
+      return {
+        weeklyHours, workdays, weeklyHoliday,
+        weeklyStd_u5, monthlyStd_u5,
+        weeklyStd_o5, monthlyStd_o5
+      };
     }
 
     // 표 행 계산
     function calcRow(tr, minWage, conWage){
       const hours = Array.from(tr.querySelectorAll('input.input-hours')).map(inp=>parseFloat(inp.value)||0);
-      const { weeklyHoliday, weeklyStd, monthlyStd } = weeklyCalc(hours);
-      const minGross = monthlyStd * minWage;
-      const conGross = monthlyStd * conWage;
-      // FIX: 숫자와 문자열 연결 시 '+' 연산자 추가
+
+      const {
+        weeklyHoliday,
+        weeklyStd_u5, monthlyStd_u5,
+        weeklyStd_o5, monthlyStd_o5
+      } = weeklyCalcSplit(hours);
+
+      // 급여
+      const minGross_u5 = monthlyStd_u5 * minWage;
+      const conGross_u5 = monthlyStd_u5 * conWage;
+      const minGross_o5 = monthlyStd_o5 * minWage;
+      const conGross_o5 = monthlyStd_o5 * conWage;
+
+      // 출력
       tr.querySelector('.weeklyHoliday').textContent = weeklyHoliday.toFixed(1) + ' 시간';
-      tr.querySelector('.weeklyStd').textContent     = weeklyStd.toFixed(1) + ' 시간';
-      tr.querySelector('.monthlyStd').textContent    = monthlyStd + ' 시간';
-      tr.querySelector('.minGross').textContent      = (minGross?nf.format(minGross):0) + ' 원';
-      tr.querySelector('.conGross').textContent      = (conGross?nf.format(conGross):0) + ' 원';
+
+      tr.querySelector('.weeklyStd_u5').textContent  = weeklyStd_u5.toFixed(1) + ' 시간';
+      tr.querySelector('.monthlyStd_u5').textContent = monthlyStd_u5 + ' 시간';
+      tr.querySelector('.minGross_u5').textContent   = (minGross_u5?nf.format(minGross_u5):0) + ' 원';
+      tr.querySelector('.conGross_u5').textContent   = (conGross_u5?nf.format(conGross_u5):0) + ' 원';
+
+      tr.querySelector('.weeklyStd_o5').textContent  = weeklyStd_o5.toFixed(1) + ' 시간';
+      tr.querySelector('.monthlyStd_o5').textContent = monthlyStd_o5 + ' 시간';
+      tr.querySelector('.minGross_o5').textContent   = (minGross_o5?nf.format(minGross_o5):0) + ' 원';
+      tr.querySelector('.conGross_o5').textContent   = (conGross_o5?nf.format(conGross_o5):0) + ' 원';
     }
 
-    // 1안(첫 행) 기준 연동용 값
+    // 1안(첫 행) 기준 연동용 값 (주휴 포함/별도 시급 변환에 사용)
     function getRefRow(){ return tbody.rows[0] || null; }
     function refStats(){
       const tr = getRefRow();
       if(!tr) return { monthlyStd:0, monthlyStdNH:0 };
       const hours = Array.from(tr.querySelectorAll('input.input-hours')).map(inp=>parseFloat(inp.value)||0);
-      const { weeklyHours, monthlyStd } = weeklyCalc(hours);
-      const monthlyStdNH = Math.ceil(weeklyHours * 4.345); // 별도로 계산된 월소정근로시간(정수 올림)
+      // 변환 기준은 ‘5인 미만’ 주휴 포함 표준 기준 유지
+      const weeklyHours = hours.reduce((a,b)=>a+b,0);
+      const weeklyHoliday = weeklyHours>=15 && hours.filter(h=>h>0).length>0 ? Math.min((weeklyHours/40)*8,8) : 0;
+      const weeklyStd = weeklyHours + weeklyHoliday;
+      const monthlyStd = Math.ceil(weeklyStd * MONTH_FACTOR); // 주휴 포함 기준
+      const monthlyStdNH = Math.ceil(weeklyHours * 4.345);    // 주휴 제외 기준
       return { monthlyStd, monthlyStdNH };
     }
 
-    // 별도 → 포함
+    // 별도 → 포함 (표시 연동)
     function syncIncludedFromExcluded(){
       if(isSyncing) return;
       isSyncing = true;
@@ -313,19 +373,18 @@
       isSyncing = false;
     }
 
-    // 포함 → 별도
+    // 포함 → 별도 (표시 연동)
     function syncExcludedFromIncluded(){
       if(isSyncing) return;
       isSyncing = true;
-      const { monthlyStd, monthlyStdNH } = refStats();
+      const { monthlyStd } = refStats();
       const included = toInt(conInput2.value);
-      if(monthlyStd > 0 && monthlyStdNH > 0 && included > 0){
-        // 이 총액을 주휴 제외 월 소정 근로시간으로 나누어 주휴 별도 시급 역산
-        const contractGross = monthlyStd * included; // 주휴 포함 시급 X 주휴 포함 월 소정 근로시간
+      if(monthlyStd > 0 && included > 0){
+        // 포함시급을 월 총액으로 환산 후, 5인 미만 표준 월소정으로 나누어 별도시급 역산
+        const contractGross = monthlyStd * included;
         const excluded = Math.round(contractGross / monthlyStd);
-        // const excluded = Math.round(contractGross / monthlyStdNH); // 원본의 오류 수정 (주휴 포함 총액 / 주휴 포함 시간)
         conInput.value = excluded ? nf.format(excluded) : '';
-        autoCalc(); // 별도시급이 실제 계산에 사용되므로 재계산
+        autoCalc(); // 실제 계산에 별도시급 사용
       }
       isSyncing = false;
     }
@@ -336,7 +395,7 @@
       const conWage = toInt(conInput.value);
       Array.from(tbody.rows).forEach(tr=>calcRow(tr, minWage, conWage));
 
-      // 최근 편집 방향에 따라 동기화
+      // 최근 편집 방향에 따라 시급 동기화
       if(lastEdited === 'excluded'){
         syncIncludedFromExcluded();
       }else{
