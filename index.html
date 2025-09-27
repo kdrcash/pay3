@@ -23,7 +23,6 @@
     .modal.show { display:flex }
     .after-tax { display:block; font-size:12px; color:#6b7280; margin-top:2px }
     .badge { font-size:11px; padding:.15rem .5rem; border-radius:.375rem; border:1px solid }
-    .btn { display:inline-flex; align-items:center; justify-content:center; gap:.35rem; }
   </style>
 </head>
 <body class="p-4 sm:p-6 flex items-center justify-center min-h-screen">
@@ -35,7 +34,7 @@
         <h1 class="text-3xl sm:text-[2rem] font-extrabold leading-tight text-gray-900">최저임금 계산기</h1>
         <div class="flex items-center gap-2 sm:gap-3">
           <span id="table_status" class="badge text-gray-700 border-gray-300 bg-gray-50">세액표: 로딩 중…</span>
-          <button id="ver_btn" type="button" class="text-blue-600 font-semibold hover:text-blue-800 underline" aria-haspopup="dialog" aria-controls="ver_modal">Ver 1.3</button>
+          <button id="ver_btn" type="button" class="text-blue-600 font-semibold hover:text-blue-800 underline" aria-haspopup="dialog" aria-controls="ver_modal">Ver 1.4</button>
         </div>
       </div>
     </section>
@@ -43,6 +42,7 @@
     <!-- 제목 하단 배너 4개 -->
     <div class="px-4 sm:px-5 mb-5">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- 배너 1 -->
         <a href="https://www.kdrcash.kr/" target="_blank" rel="noopener noreferrer" class="block group" aria-label="닥터캐시 홈">
           <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
             <img loading="lazy" decoding="async"
@@ -51,6 +51,7 @@
                  class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
           </div>
         </a>
+        <!-- 배너 2 (URL 오타 수정) -->
         <a href="https://www.kdrcash.kr/" target="_blank" rel="noopener noreferrer" class="block group" aria-label="닥터캐시 홈 2">
           <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
             <img loading="lazy" decoding="async"
@@ -59,6 +60,7 @@
                  class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
           </div>
         </a>
+        <!-- 배너 3 -->
         <a href="https://www.kdrcash.kr/download" target="_blank" rel="noopener noreferrer" class="block group" aria-label="다운로드">
           <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
             <img loading="lazy" decoding="async"
@@ -67,6 +69,7 @@
                  class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
           </div>
         </a>
+        <!-- 배너 4 -->
         <a href="https://www.kdrcash.kr/survey" target="_blank" rel="noopener noreferrer" class="block group" aria-label="개원 필수자료 모음">
           <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
             <img loading="lazy" decoding="async"
@@ -102,21 +105,31 @@
           <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">주휴수당 별도</p>
         </div>
 
-        <!-- 계약시급 (주휴 포함 환산 표시) -->
+        <!-- 계약시급 (주휴 포함 환산: 5인 미만) -->
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2">
             <label class="text-sm font-semibold text-gray-700">계약시급 (원)</label>
-            <input id="contract_wage2" type="text" value="10,030"
-                   class="input-xl input-wage focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="계약시급(주휴 포함)">
+            <input id="contract_wage2_u5" type="text" value="10,030"
+                   class="input-xl input-wage focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="계약시급 주휴 포함(5인 미만)">
           </div>
-          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">주휴수당 포함</p>
+          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">주휴수당 포함(5인 미만)</p>
+        </div>
+
+        <!-- 계약시급 (주휴 포함 환산: 5인 이상) -->
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <label class="text-sm font-semibold text-gray-700">계약시급 (원)</label>
+            <input id="contract_wage2_o5" type="text" value="10,030"
+                   class="input-xl input-wage focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="계약시급 주휴 포함(5인 이상)">
+          </div>
+          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">주휴수당 포함(5인 이상)</p>
         </div>
 
         <!-- 비과세 합계(월) -->
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2">
             <label class="text-sm font-semibold text-gray-700">비과세 (월)</label>
-            <input id="nontax_monthly" type="text" value="0"
+            <input id="nontax_monthly" type="text" value=""
                    class="input-xl input-wage focus:outline-none focus:ring-2 focus:ring-blue-500"
                    placeholder="200,000" aria-label="비과세 합계(월)">
           </div>
@@ -124,14 +137,12 @@
         </div>
       </div>
 
-      <!-- 버튼줄 (모달 버튼을 초기화 우측으로 이동 & 동일 높이) -->
+      <!-- 버튼줄 -->
       <div class="flex flex-wrap items-center gap-2 mb-3">
         <button id="add_row"
                 class="w-28 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm">+ 행 추가</button>
         <button id="reset_rows"
                 class="w-28 bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-lg text-sm">초기화</button>
-
-        <!-- 동일 높이(px-3 py-2)로 통일 -->
         <button id="wage_mode_open" type="button"
                 class="px-3 py-2 rounded-lg text-sm border border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100"
                 aria-haspopup="dialog" aria-controls="wage_mode_modal">
@@ -198,24 +209,20 @@
     <div class="absolute inset-0 bg-black/50"></div>
     <div role="dialog" aria-modal="true" class="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl p-6">
       <div class="flex items-start justify-between mb-3">
-        <h3 class="text-lg font-bold text-gray-800">버전 1.3 • 계산 규칙</h3>
+        <h3 class="text-lg font-bold text-gray-800">버전 1.4 • 계산 규칙</h3>
         <button id="ver_close" class="p-2 -m-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="닫기">✕</button>
       </div>
       <div class="text-sm text-gray-700 space-y-4">
         <ul class="list-disc pl-5 space-y-1">
-          <li><b>주휴수당</b>: <b>주 15시간 이상 근무</b> & 소정근로일 개근 시 발생</li>
-          <li><b>주휴시간</b> = (주간 근로시간 ÷ 40) × 8 (최대 8시간)</li>
-          <li><b>주총근로시간(5인 미만)</b> = 주간 근로시간 + 주휴시간</li>
-          <li><b>주총근로시간(5인 이상)</b> = <span class="whitespace-pre-line">일별 연장시간 합계 = Σ max(0, h-8)
-주40 초과 연장시간 = max(0, 주간총시간-40)
-가산시간 = 0.5 × max(일별 연장시간 합계, 주40 초과 연장시간)
-주총근로시간 = (주간총시간 + 가산시간) + 주휴시간</span></li>
-          <li><b>월총근로시간</b> = 주총근로시간 × (365 ÷ 7 ÷ 12) (정수 올림)</li>
-          <li><b>최저급여(세후)</b>는 비과세 0원 가정, <b>계약급여(세후)</b>는 입력한 비과세(월) 반영</li>
-          <li><b>계약시급 유형</b> 세전/세후 선택 가능(세후는 행별 실수령을 기준으로 세전 역산 반영)</li>
-          <li><b>간이세액표</b> 2024 1인 JSON 적용(10원 절사, 장기요양=건보×12.95%, 연금/건보 상·하한, 비과세 제외)</li>
-          <li>최저시급(2025) = <b>10,030원</b></li>
-          <li>시급 연동(별도↔포함)은 1안(첫 행) 기준</li>
+          <li>주휴수당: 주 15시간 이상 & 소정근로일 개근 시 발생</li>
+          <li>주휴시간 = (주간 근로시간 ÷ 40) × 8 (최대 8시간)</li>
+          <li>5인 미만: 주총 = 주간 + 주휴</li>
+          <li>5인 이상: 가산시간 = 0.5×max(Σmax(0,h-8), max(0,주간-40)); 주총 = (주간+가산)+주휴</li>
+          <li>월총근로시간 = 주총 × (365 ÷ 7 ÷ 12) (정수 올림)</li>
+          <li>최저급여(세후) 비과세 0 가정, 계약급여(세후)는 입력 비과세 반영(미입력 시 0)</li>
+          <li>계약시급 유형(세전/세후) 선택 가능(세후는 실수령→세전 역산)</li>
+          <li>간이세액표 2024 1인 기준, 10원 절사, 장기요양=건보×12.95%, 연금/건보 상·하한, 비과세 제외</li>
+          <li>시급 연동(별도↔포함)은 1안(첫 행) 기준, 포함은 5인 미만/이상 각각 제공</li>
         </ul>
       </div>
       <div class="mt-5 flex justify-end gap-2">
@@ -360,17 +367,18 @@
     /* ===== DOM & 상태 ===== */
     const tbody = document.getElementById('tbody');
     const minInput = document.getElementById('min_wage');
-    const conInput = document.getElementById('contract_wage');
-    const conInput2 = document.getElementById('contract_wage2');
+    const conInput = document.getElementById('contract_wage');        // 주휴 별도(기준)
+    const conInput2U5 = document.getElementById('contract_wage2_u5'); // 주휴 포함(5인 미만)
+    const conInput2O5 = document.getElementById('contract_wage2_o5'); // 주휴 포함(5인 이상)
     const nonTaxInput = document.getElementById('nontax_monthly');
     const wageModeLabel = document.getElementById('wage_mode_label');
 
-    [minInput, conInput, conInput2, nonTaxInput].forEach(bindComma);
+    [minInput, conInput, conInput2U5, conInput2O5, nonTaxInput].forEach(bindComma);
 
     let isSyncing = false;
-    let lastEdited = 'excluded'; // 'excluded' | 'included'
+    let lastEdited = 'excluded'; // 'excluded' | 'included_u5' | 'included_o5'
     let wageMode = 'gross';      // 'gross' | 'net'
-    let calcScheduled = false;   // ★ 중복 선언 금지, 여기서만 1회 선언
+    let calcScheduled = false;
 
     const DAYS = 7;
     function dayCell(defaultVal){
@@ -404,29 +412,45 @@
       scheduleCalc();
     });
 
+    /* ===== 시간 집계 ===== */
     function weeklyCalcSplit(dayHours){
       const weeklyHours = dayHours.reduce((a,b)=>a+b,0);
       const eligible = weeklyHours>=15 && dayHours.some(h=>h>0);
       const weeklyHoliday = eligible ? Math.min((weeklyHours/40)*8,8) : 0;
 
-      const weeklyStd_u5 = weeklyHours + weeklyHoliday;
-
       const dailyOver = dayHours.reduce((s,h)=> s + Math.max(0, h - 8), 0);
       const weeklyOver = Math.max(0, weeklyHours - 40);
       const premium = 0.5 * Math.max(dailyOver, weeklyOver);
-      const weeklyStd_o5 = (weeklyHours + premium) + weeklyHoliday;
 
-      const monthlyStd_u5 = Math.ceil(weeklyStd_u5 * MONTH_FACTOR);
-      const monthlyStd_o5 = Math.ceil(weeklyStd_o5 * MONTH_FACTOR);
+      // 5인 미만 기준
+      const weeklyStd_u5 = weeklyHours + weeklyHoliday;
+      // 5인 이상 기준
+      const adjustedWork_o5 = weeklyHours + premium;
+      const weeklyStd_o5 = adjustedWork_o5 + weeklyHoliday;
 
-      return { weeklyHours, weeklyHoliday, weeklyStd_u5, monthlyStd_u5, weeklyStd_o5, monthlyStd_o5 };
+      const monthlyStdNH_u5 = Math.ceil(weeklyHours * MONTH_FACTOR);
+      const monthlyStd_u5   = Math.ceil(weeklyStd_u5 * MONTH_FACTOR);
+
+      const monthlyStdNH_o5 = Math.ceil(adjustedWork_o5 * MONTH_FACTOR);
+      const monthlyStd_o5   = Math.ceil(weeklyStd_o5 * MONTH_FACTOR);
+
+      return {
+        weeklyHours, weeklyHoliday, premium,
+        weeklyStd_u5, monthlyStd_u5, monthlyStdNH_u5,
+        weeklyStd_o5, monthlyStd_o5, monthlyStdNH_o5
+      };
     }
 
+    /* ===== 계산(표 한 행) ===== */
     function calcRow(tr, minWage, conWage, nonTaxMonthly){
       const hoursInputs = tr.querySelectorAll('input.input-hours');
       const hours = Array.from(hoursInputs, inp => parseFloat(inp.value)||0);
 
-      const { weeklyHoliday, weeklyStd_u5, monthlyStd_u5, weeklyStd_o5, monthlyStd_o5 } = weeklyCalcSplit(hours);
+      const {
+        weeklyHoliday,
+        weeklyStd_u5, monthlyStd_u5,
+        weeklyStd_o5, monthlyStd_o5
+      } = weeklyCalcSplit(hours);
 
       // 최저(비과세 0 가정)
       const minGross_u5 = monthlyStd_u5 * minWage;
@@ -473,55 +497,73 @@
       setGrossCell('.conGross_o5', conGross_o5, conNet_o5);
     }
 
-    // 1안(첫 행) 기준 연동 값
+    /* ===== 1안(첫 행) 기준 시간 통계 ===== */
     function getRefRow(){ return tbody.rows[0] || null; }
     function refStats(){
       const tr = getRefRow();
-      if(!tr) return { monthlyStd:0, monthlyStdNH:0 };
+      if(!tr) return { monthlyStd_u5:0, monthlyStdNH_u5:0, monthlyStd_o5:0, monthlyStdNH_o5:0 };
       const hours = Array.from(tr.querySelectorAll('input.input-hours'), inp=>parseFloat(inp.value)||0);
-      const weeklyHours = hours.reduce((a,b)=>a+b,0);
-      const weeklyHoliday = weeklyHours>=15 && hours.some(h=>h>0) ? Math.min((weeklyHours/40)*8,8) : 0;
-      const weeklyStd = weeklyHours + weeklyHoliday;
-      const monthlyStd = Math.ceil(weeklyStd * MONTH_FACTOR);     // 주휴 포함
-      const monthlyStdNH = Math.ceil(weeklyHours * MONTH_FACTOR);  // 주휴 제외
-      return { monthlyStd, monthlyStdNH };
+      const {
+        monthlyStd_u5, monthlyStdNH_u5,
+        monthlyStd_o5, monthlyStdNH_o5
+      } = weeklyCalcSplit(hours);
+      return { monthlyStd_u5, monthlyStdNH_u5, monthlyStd_o5, monthlyStdNH_o5 };
     }
 
-    // 포함/별도 시급 동기화
+    /* ===== 시급 동기화 ===== */
     function syncIncludedFromExcluded(){
       if(isSyncing) return;
       isSyncing = true;
-      const { monthlyStd, monthlyStdNH } = refStats();
+      const { monthlyStd_u5, monthlyStdNH_u5, monthlyStd_o5, monthlyStdNH_o5 } = refStats();
       const excluded = toInt(conInput.value);
-      if(monthlyStd > 0 && monthlyStdNH > 0 && excluded > 0){
-        conInput2.value = nf.format(Math.round((monthlyStd * excluded) / monthlyStdNH));
-      } else {
-        conInput2.value = '';
+      if(excluded>0){
+        if(monthlyStd_u5>0 && monthlyStdNH_u5>0){
+          conInput2U5.value = nf.format(Math.round((monthlyStd_u5 * excluded) / monthlyStdNH_u5));
+        }else{ conInput2U5.value=''; }
+        if(monthlyStd_o5>0 && monthlyStdNH_o5>0){
+          conInput2O5.value = nf.format(Math.round((monthlyStd_o5 * excluded) / monthlyStdNH_o5));
+        }else{ conInput2O5.value=''; }
+      }else{
+        conInput2U5.value=''; conInput2O5.value='';
       }
       isSyncing = false;
     }
-    function syncExcludedFromIncluded(){
+
+    function syncExcludedFromIncluded(kind){
       if(isSyncing) return;
       isSyncing = true;
-      const { monthlyStd, monthlyStdNH } = refStats();
-      const included = toInt(conInput2.value);
-      if(monthlyStd > 0 && monthlyStdNH > 0 && included > 0){
-        conInput.value = nf.format(Math.round((monthlyStdNH * included) / monthlyStd));
-        scheduleCalc();
-      } else {
-        conInput.value = '';
+      const { monthlyStd_u5, monthlyStdNH_u5, monthlyStd_o5, monthlyStdNH_o5 } = refStats();
+      if(kind==='u5'){
+        const inc = toInt(conInput2U5.value);
+        if(inc>0 && monthlyStd_u5>0 && monthlyStdNH_u5>0){
+          conInput.value = nf.format(Math.round((monthlyStdNH_u5 * inc) / monthlyStd_u5));
+        }else{ conInput.value=''; }
+      }else if(kind==='o5'){
+        const inc = toInt(conInput2O5.value);
+        if(inc>0 && monthlyStd_o5>0 && monthlyStdNH_o5>0){
+          conInput.value = nf.format(Math.round((monthlyStdNH_o5 * inc) / monthlyStd_o5));
+        }else{ conInput.value=''; }
       }
       isSyncing = false;
+      // 기준(별도) 갱신 후 양쪽 포함 시급도 재계산해 일관성 유지
+      syncIncludedFromExcluded();
     }
 
     /* ===== 계산 배치 ===== */
     function autoCalc(){
       const minWage = toInt(minInput.value);
       const conWage = toInt(conInput.value);
-      const nonTaxMonthly = toInt(nonTaxInput.value);
+      const nonTaxMonthly = toInt(nonTaxInput.value); // 빈 값이면 0
+
       Array.from(tbody.rows).forEach(tr=>calcRow(tr, minWage, conWage, nonTaxMonthly));
-      if(lastEdited === 'excluded') syncIncludedFromExcluded();
-      else syncExcludedFromIncluded();
+
+      if(lastEdited === 'excluded'){
+        syncIncludedFromExcluded();
+      }else if(lastEdited === 'included_u5'){
+        syncExcludedFromIncluded('u5');
+      }else if(lastEdited === 'included_o5'){
+        syncExcludedFromIncluded('o5');
+      }
     }
     function scheduleCalc(){
       if(calcScheduled) return;
@@ -529,7 +571,7 @@
       requestAnimationFrame(()=>{ calcScheduled=false; autoCalc(); });
     }
 
-    // === 라디오 동기화 헬퍼 ===
+    /* ===== 라디오 동기화 헬퍼 ===== */
     function setWageModeRadios(mode){
       const grossRadio = document.querySelector('input[name="wage_mode"][value="gross"]');
       const netRadio   = document.querySelector('input[name="wage_mode"][value="net"]');
@@ -538,17 +580,24 @@
       else { grossRadio.checked = false; netRadio.checked = true; }
     }
 
-    // 입력 리스너
-    minInput.addEventListener('input', scheduleCalc);
-    nonTaxInput.addEventListener('input', scheduleCalc);
+    /* ===== 이벤트 바인딩 ===== */
+    [minInput, nonTaxInput].forEach(el=>el.addEventListener('input', scheduleCalc));
+
     conInput.addEventListener('input', ()=>{
       lastEdited = 'excluded';
       syncIncludedFromExcluded();
       scheduleCalc();
     });
-    conInput2.addEventListener('input', ()=>{
-      lastEdited = 'included';
-      syncExcludedFromIncluded();
+
+    conInput2U5.addEventListener('input', ()=>{
+      lastEdited = 'included_u5';
+      syncExcludedFromIncluded('u5');
+      scheduleCalc();
+    });
+    conInput2O5.addEventListener('input', ()=>{
+      lastEdited = 'included_o5';
+      syncExcludedFromIncluded('o5');
+      scheduleCalc();
     });
 
     document.getElementById('add_row').addEventListener('click', ()=>{
@@ -561,8 +610,9 @@
       const nf10k = nf.format(10030);
       minInput.value = nf10k;
       conInput.value = nf10k;
-      conInput2.value = nf10k;
-      nonTaxInput.value = '0';
+      conInput2U5.value = nf10k;
+      conInput2O5.value = nf10k;
+      nonTaxInput.value = ''; // 빈 값(=0 처리)
       lastEdited = 'excluded';
 
       // 모드/라디오 초기화
@@ -589,7 +639,6 @@
     function openModal(m){ m.classList.add('show'); document.body.classList.add('overflow-hidden'); }
     function closeModal(m){ m.classList.remove('show'); document.body.classList.remove('overflow-hidden'); }
 
-    // 모달 열 때 현재 모드로 라디오 동기화
     document.getElementById('wage_mode_open').addEventListener('click', ()=>{
       setWageModeRadios(wageMode);
       openModal(wageModeModal);
@@ -599,7 +648,6 @@
       const dialog = wageModeModal.querySelector('[role="dialog"]');
       if(dialog && !dialog.contains(e.target)) closeModal(wageModeModal);
     });
-
     wageModeApply.addEventListener('click', ()=>{
       const selected = document.querySelector('input[name="wage_mode"]:checked')?.value || 'gross';
       wageMode = selected;
