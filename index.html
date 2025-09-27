@@ -19,7 +19,6 @@
     .input-wage  { width: 140px; }
     .nowrap { white-space: nowrap; }
 
-    /* 시간 입력칸(요일) */
     .hour-wrap { position: relative; display: inline-block; }
     .input-hours {
       width: 100%; max-width: 90px;
@@ -33,12 +32,15 @@
       font-size: 12px; color: #9ca3af; pointer-events: none;
     }
 
-    /* “주총근로시간 / 월총근로시간” 전용 작은 폰트 */
     .small-text { font-size: 12px; line-height: 1.2; }
 
-    /* 모달 */
     .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:50; }
     .modal.show { display:flex; }
+
+    .after-tax { display:block; font-size:12px; color:#6b7280; margin-top:2px; }
+    .badge {
+      font-size:11px; padding:.15rem .5rem; border-radius:.375rem; border:1px solid;
+    }
   </style>
 </head>
 <body class="p-4 sm:p-6 flex items-center justify-center min-h-screen">
@@ -48,7 +50,10 @@
     <section class="card p-5 sm:p-7 mb-4">
       <div class="flex items-center justify-between gap-3">
         <h1 class="text-3xl sm:text-[2rem] font-extrabold leading-tight text-gray-900">최저임금 계산기</h1>
-        <button id="ver_btn" type="button" class="text-blue-600 font-semibold hover:text-blue-800 underline">Ver 1.1</button>
+        <div class="flex items-center gap-3">
+          <span id="table_status" class="badge text-gray-700 border-gray-300 bg-gray-50">세액표: 로딩 중…</span>
+          <button id="ver_btn" type="button" class="text-blue-600 font-semibold hover:text-blue-800 underline">Ver 1.2</button>
+        </div>
       </div>
     </section>
 
@@ -84,7 +89,7 @@
 
     <!-- 본문 계산기 -->
     <section class="card p-6 mb-6">
-      <!-- 시급 입력란 -->
+      <!-- 시급/비과세 입력란 -->
       <div class="flex gap-6 mb-4 flex-wrap">
         <!-- 최저시급 -->
         <div class="flex flex-col gap-2">
@@ -115,6 +120,17 @@
           </div>
           <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">주휴수당 포함</p>
         </div>
+
+        <!-- 비과세 합계(월) -->
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <label class="text-sm font-semibold text-gray-700">비과세(월)</label>
+            <input id="nontax_monthly" type="text" value="0"
+                   class="input-xl input-wage focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="식대/자가운전 등">
+          </div>
+          <p class="text-xs text-gray-400 -mt-1 ml-[86px] w-[140px] text-center">소득세·4대보험 산정에서 제외</p>
+        </div>
       </div>
 
       <!-- 버튼 -->
@@ -138,13 +154,9 @@
             </tr>
             <tr>
               <th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th><th>일</th>
-
-              <!-- 여기만 글씨 작게 -->
               <th class="small-text">주총근로시간</th>
               <th class="small-text">월총근로시간</th>
               <th>최저급여</th><th>계약급여</th>
-
-              <!-- 여기만 글씨 작게 -->
               <th class="small-text">주총근로시간</th>
               <th class="small-text">월총근로시간</th>
               <th>최저급여</th><th>계약급여</th>
@@ -179,13 +191,13 @@
     </section>
   </main>
 
-  <!-- Ver 1.1 모달 -->
+  <!-- Ver 1.2 모달 -->
   <div id="ver_modal" class="modal">
     <div class="absolute inset-0 bg-black/50"></div>
     <div role="dialog" aria-modal="true"
          class="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl p-6">
       <div class="flex items-start justify-between mb-3">
-        <h3 class="text-lg font-bold text-gray-800">버전 1.1 • 계산 규칙</h3>
+        <h3 class="text-lg font-bold text-gray-800">버전 1.2 • 계산 규칙</h3>
         <button id="ver_close"
                 class="p-2 -m-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-label="닫기">✕</button>
@@ -200,12 +212,12 @@
 일별 연장시간 합계 = Σ max(0, h-8)
 주40 초과 연장시간 = max(0, 주간총시간-40)
 가산시간 = 0.5 × max(일별 연장시간 합계, 주40 초과 연장시간)
-주총근로시간 = 가산반영 주간 근로시간 + 주휴시간</span></li>
+주총근로시간 = (주간총시간 + 가산시간) + 주휴시간</span></li>
           <li><b>월총근로시간</b> = 주총근로시간 × (365 ÷ 7 ÷ 12) (정수 올림)</li>
-          <li><b>최저급여</b> = 월총근로시간 × 최저시급, 
-          <li><b>계약급여</b> = 월총근로시간 × 계약시급</li>
+          <li><b>급여 칸</b>에는 <b>세전</b> 금액과, 근로자 공제(4대보험+소득·지방세)를 반영한 <b>(세후)</b>를 함께 표시</li>
+          <li><b>간이세액표</b>는 2024년 1인 기준 JSON을 로드하여 적용(10원 절사, 장기요양=건보×12.95%, 연금/건보 상·하한, 비과세 제외)</li>
           <li>최저시급(2025) = <b>10,030원</b></li>
-          <li>시급 연동(별도↔포함)은 1안(첫 행) 기준으로 계산됩니다.</li>
+          <li>시급 연동(별도↔포함)은 1안(첫 행) 기준</li>
         </ul>
       </div>
       <div class="mt-5 flex justify-end gap-2">
@@ -219,35 +231,126 @@
 
   <!-- 스크립트 -->
   <script>
-    // 유틸
+    /* ===========================
+       공통 유틸
+    ============================ */
     const nf = new Intl.NumberFormat('ko-KR');
     const onlyNumber = s => (s ?? '').toString().replace(/[^\d]/g,'');
     const toInt = s => parseFloat(onlyNumber(s)) || 0;
     const MONTH_FACTOR = 365/7/12; // ≈ 4.345
+    const trunc10 = v => Math.floor(v/10)*10;
+    const clamp = (x, lo, hi) => Math.min(Math.max(x, lo), hi);
+    function fmtWon(n){ return n ? nf.format(Math.round(n)) + ' 원' : '0 원'; }
 
-    // DOM
-    const tbody = document.getElementById('tbody');
-    const minInput = document.getElementById('min_wage');
-    const conInput = document.getElementById('contract_wage');   // 주휴 별도 (계산에 사용)
-    const conInput2 = document.getElementById('contract_wage2'); // 주휴 포함 (연동 표시/입력)
-
-    // 연동 상태 제어
-    let isSyncing = false;
-    let lastEdited = 'excluded'; // 'excluded' | 'included'
-
-    // 쉼표 입력 & 즉시 계산(필요 대상만)
     function bindComma(input){
       input.addEventListener('input', (e)=>{
         const raw = onlyNumber(e.target.value);
         e.target.value = raw ? nf.format(parseInt(raw)) : '';
         const end = e.target.value.length;
         e.target.setSelectionRange(end, end);
-        if (input === minInput || input === conInput) autoCalc();
+        if ([minInput, conInput, nonTaxInput].includes(input)) autoCalc();
       });
     }
-    [minInput, conInput, conInput2].forEach(bindComma);
 
-    // 행 생성
+    /* ===========================
+       세액표(JSON) 로드
+    ============================ */
+    let TAX_TABLE = [];
+    let tableReady = false;
+    const tableStatusEl = document.getElementById('table_status');
+
+    async function loadTaxTable(){
+      function setStatus(text, style='loading'){
+        if(!tableStatusEl) return;
+        tableStatusEl.textContent = '세액표: ' + text;
+        tableStatusEl.classList.remove('text-gray-700','border-gray-300','bg-gray-50','text-green-700','border-green-300','bg-green-50','text-red-700','border-red-300','bg-red-50');
+        if(style==='ok') tableStatusEl.classList.add('text-green-700','border-green-300','bg-green-50');
+        else if(style==='error') tableStatusEl.classList.add('text-red-700','border-red-300','bg-red-50');
+        else tableStatusEl.classList.add('text-gray-700','border-gray-300','bg-gray-50');
+      }
+      setStatus('로딩 중…','loading');
+      async function tryFetch(path){
+        const r = await fetch(path, { cache:'no-store' });
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        return r.json();
+      }
+      try{
+        try {
+          TAX_TABLE = await tryFetch('./simplified_tax_table_2024_1person.v2.json');
+        } catch {
+          TAX_TABLE = await tryFetch('./simplified_tax_table_2024_1person.json');
+        }
+        TAX_TABLE.sort((a,b)=>a.min_won-b.min_won);
+        tableReady = true;
+        setStatus('로드 완료','ok');
+        autoCalc(); // 로드 직후 세후값 갱신
+      }catch(e){
+        tableReady = false;
+        setStatus('로드 실패', 'error');
+        console.error('Tax table load failed:', e);
+        // 실패해도 표 자체는 동작(세후는 "로딩중" 메시지 유지)
+      }
+    }
+    loadTaxTable();
+
+    // 이진 탐색으로 세액표 조회
+    function lookupTable(amountExclNT){
+      let lo=0, hi=TAX_TABLE.length-1;
+      while(lo<=hi){
+        const m=(lo+hi)>>1, row=TAX_TABLE[m];
+        if(amountExclNT < row.min_won) hi=m-1;
+        else if(amountExclNT >= row.max_won) lo=m+1;
+        else return { found:true, tax: +row.tax || 0 };
+      }
+      return { found:false, tax:0 };
+    }
+
+    /* ===========================
+       세금/공제 계산 (근로자 부담만)
+    ============================ */
+    const NP_MIN=400_000, NP_MAX=6_370_000;            // 국민연금 기준소득 하·상한
+    const HI_MIN=279_266, HI_MAX=127_056_982;          // 건강보험 보수월액 하·상한
+    const NP_RATE=0.0450, HI_RATE=0.03545, LTC_RATE=0.1295, EI_RATE=0.0090;
+    const TAX_ZERO_THRESHOLD = 1_060_000;              // 비과세 제외 세전 월액 < 임계값 → 소득세/지방세 0
+
+    function employeeDeductionsUsingTable(grossMonthly, nonTaxMonthly){
+      const baseIns = Math.max(grossMonthly - (nonTaxMonthly||0), 0);
+      const baseNP = clamp(Math.floor(baseIns/1000)*1000, NP_MIN, NP_MAX);
+      const baseHI = clamp(baseIns, HI_MIN, HI_MAX);
+      const baseEI = baseIns;
+
+      const np  = trunc10(baseNP * NP_RATE);
+      const hi  = trunc10(baseHI * HI_RATE);
+      const ltc = trunc10(hi * LTC_RATE);
+      const ei  = trunc10(baseEI * EI_RATE);
+
+      let tax = 0, ltax = 0;
+      if (baseIns >= TAX_ZERO_THRESHOLD && tableReady){
+        const hit = lookupTable(baseIns);
+        tax = trunc10(hit.tax || 0);
+        ltax = trunc10(tax * 0.1);
+      } else if (baseIns >= TAX_ZERO_THRESHOLD && !tableReady){
+        // 테이블 미준비 상태: 세후 표시를 보류(문구로 대체)하기 위해 total만 0 유지
+        tax = 0; ltax = 0;
+      }
+      const total = np + hi + ltc + ei + tax + ltax;
+      return { total, np, hi, ltc, ei, tax, ltax, baseIns };
+    }
+
+    /* ===========================
+       DOM
+    ============================ */
+    const tbody = document.getElementById('tbody');
+    const minInput = document.getElementById('min_wage');
+    const conInput = document.getElementById('contract_wage');
+    const conInput2 = document.getElementById('contract_wage2');
+    const nonTaxInput = document.getElementById('nontax_monthly');
+
+    [minInput, conInput, conInput2, nonTaxInput].forEach(bindComma);
+
+    let isSyncing = false;
+    let lastEdited = 'excluded'; // 'excluded' | 'included'
+
     const DAYS = 7;
     function dayCell(defaultVal){
       return `
@@ -280,7 +383,6 @@
     }
     function addRow(idx){ tbody.insertAdjacentHTML('beforeend', rowHtml(idx)); }
 
-    // 시간 입력(소수점 1개 허용)
     tbody.addEventListener('input', (e)=>{
       if(!(e.target instanceof HTMLInputElement)) return;
       if(!e.target.classList.contains('input-hours')) return;
@@ -292,19 +394,15 @@
       autoCalc();
     });
 
-    // 주/월 시간 계산 (5인 미만 + 5인 이상)
     function weeklyCalcSplit(dayHours){
       const workdays = dayHours.filter(h=>h>0.0001).length;
       const weeklyHours = dayHours.reduce((a,b)=>a+b,0);
 
-      // 주휴시간 (공통)
       const eligible = weeklyHours>=15 && workdays>0;
       const weeklyHoliday = eligible ? Math.min((weeklyHours/40)*8,8) : 0;
 
-      // 5인 미만: 주총근로시간 = 주간 총시간 + 주휴
       const weeklyStd_u5 = weeklyHours + weeklyHoliday;
 
-      // 5인 이상: 가산 로직
       const dailyOver = dayHours.reduce((s,h)=> s + Math.max(0, h - 8), 0);
       const weeklyOver = Math.max(0, weeklyHours - 40);
       const premium = 0.5 * Math.max(dailyOver, weeklyOver);
@@ -312,7 +410,6 @@
       const adjustedWork_o5 = weeklyHours + premium;
       const weeklyStd_o5 = adjustedWork_o5 + weeklyHoliday;
 
-      // 월총근로시간(정수 올림)
       const monthlyStd_u5 = Math.ceil(weeklyStd_u5 * MONTH_FACTOR);
       const monthlyStd_o5 = Math.ceil(weeklyStd_o5 * MONTH_FACTOR);
 
@@ -323,8 +420,7 @@
       };
     }
 
-    // 표 행 계산
-    function calcRow(tr, minWage, conWage){
+    function calcRow(tr, minWage, conWage, nonTaxMonthly){
       const hours = Array.from(tr.querySelectorAll('input.input-hours')).map(inp=>parseFloat(inp.value)||0);
 
       const {
@@ -333,42 +429,61 @@
         weeklyStd_o5, monthlyStd_o5
       } = weeklyCalcSplit(hours);
 
-      // 급여
+      // 세전 월급
       const minGross_u5 = monthlyStd_u5 * minWage;
       const conGross_u5 = monthlyStd_u5 * conWage;
       const minGross_o5 = monthlyStd_o5 * minWage;
       const conGross_o5 = monthlyStd_o5 * conWage;
+
+      // 세후 계산(근로자 공제)
+      const d_min_u5 = employeeDeductionsUsingTable(minGross_u5, nonTaxMonthly);
+      const d_con_u5 = employeeDeductionsUsingTable(conGross_u5, nonTaxMonthly);
+      const d_min_o5 = employeeDeductionsUsingTable(minGross_o5, nonTaxMonthly);
+      const d_con_o5 = employeeDeductionsUsingTable(conGross_o5, nonTaxMonthly);
+
+      const minNet_u5 = Math.max(minGross_u5 - d_min_u5.total, 0);
+      const conNet_u5 = Math.max(conGross_u5 - d_con_u5.total, 0);
+      const minNet_o5 = Math.max(minGross_o5 - d_min_o5.total, 0);
+      const conNet_o5 = Math.max(conGross_o5 - d_con_o5.total, 0);
+
+      // 표시 헬퍼
+      function setGrossCell(cellSel, gross, net){
+        const cell = tr.querySelector(cellSel);
+        if (!tableReady && gross>0){
+          cell.innerHTML = `<div class="text-gray-900 font-medium">${fmtWon(gross)}</div><span class="after-tax">(세후 로딩중)</span>`;
+        } else {
+          cell.innerHTML = `<div class="text-gray-900 font-medium">${fmtWon(gross)}</div><span class="after-tax">(세후 ${fmtWon(net)})</span>`;
+        }
+      }
 
       // 출력
       tr.querySelector('.weeklyHoliday').textContent = weeklyHoliday.toFixed(1) + ' 시간';
 
       tr.querySelector('.weeklyStd_u5').textContent  = weeklyStd_u5.toFixed(1) + ' 시간';
       tr.querySelector('.monthlyStd_u5').textContent = monthlyStd_u5 + ' 시간';
-      tr.querySelector('.minGross_u5').textContent   = (minGross_u5?nf.format(minGross_u5):0) + ' 원';
-      tr.querySelector('.conGross_u5').textContent   = (conGross_u5?nf.format(conGross_u5):0) + ' 원';
 
       tr.querySelector('.weeklyStd_o5').textContent  = weeklyStd_o5.toFixed(1) + ' 시간';
       tr.querySelector('.monthlyStd_o5').textContent = monthlyStd_o5 + ' 시간';
-      tr.querySelector('.minGross_o5').textContent   = (minGross_o5?nf.format(minGross_o5):0) + ' 원';
-      tr.querySelector('.conGross_o5').textContent   = (conGross_o5?nf.format(conGross_o5):0) + ' 원';
+
+      setGrossCell('.minGross_u5', minGross_u5, minNet_u5);
+      setGrossCell('.conGross_u5', conGross_u5, conNet_u5);
+      setGrossCell('.minGross_o5', minGross_o5, minNet_o5);
+      setGrossCell('.conGross_o5', conGross_o5, conNet_o5);
     }
 
-    // 1안(첫 행) 기준 연동용 값 (주휴 포함/별도 시급 변환에 사용)
     function getRefRow(){ return tbody.rows[0] || null; }
     function refStats(){
       const tr = getRefRow();
       if(!tr) return { monthlyStd:0, monthlyStdNH:0 };
       const hours = Array.from(tr.querySelectorAll('input.input-hours')).map(inp=>parseFloat(inp.value)||0);
-      // 변환 기준은 ‘5인 미만’ 주휴 포함 표준 기준 유지
       const weeklyHours = hours.reduce((a,b)=>a+b,0);
       const weeklyHoliday = weeklyHours>=15 && hours.filter(h=>h>0).length>0 ? Math.min((weeklyHours/40)*8,8) : 0;
       const weeklyStd = weeklyHours + weeklyHoliday;
-      const monthlyStd = Math.ceil(weeklyStd * MONTH_FACTOR); // 주휴 포함 기준
-      const monthlyStdNH = Math.ceil(weeklyHours * 4.345);    // 주휴 제외 기준
+      const monthlyStd = Math.ceil(weeklyStd * MONTH_FACTOR);
+      const monthlyStdNH = Math.ceil(weeklyHours * 4.345);
       return { monthlyStd, monthlyStdNH };
     }
 
-    // 별도 → 포함 (표시 연동)
     function syncIncludedFromExcluded(){
       if(isSyncing) return;
       isSyncing = true;
@@ -382,7 +497,6 @@
       isSyncing = false;
     }
 
-    // 포함 → 별도 (표시 연동)
     function syncExcludedFromIncluded(){
       if(isSyncing) return;
       isSyncing = true;
@@ -392,18 +506,18 @@
         const contractGross = monthlyStd * included;
         const excluded = Math.round(contractGross / monthlyStd);
         conInput.value = excluded ? nf.format(excluded) : '';
-        autoCalc(); // 실제 계산에 별도시급 사용
+        autoCalc();
       }
       isSyncing = false;
     }
 
-    // 전체 재계산
     function autoCalc(){
       const minWage = toInt(minInput.value);
       const conWage = toInt(conInput.value);
-      Array.from(tbody.rows).forEach(tr=>calcRow(tr, minWage, conWage));
+      const nonTaxMonthly = toInt(nonTaxInput.value);
 
-      // 최근 편집 방향에 따라 시급 동기화
+      Array.from(tbody.rows).forEach(tr=>calcRow(tr, minWage, conWage, nonTaxMonthly));
+
       if(lastEdited === 'excluded'){
         syncIncludedFromExcluded();
       }else{
@@ -411,7 +525,6 @@
       }
     }
 
-    // 컨트롤
     document.getElementById('add_row').addEventListener('click', ()=>{
       addRow(tbody.rows.length);
       autoCalc();
@@ -423,13 +536,13 @@
       minInput.value = nf10k;
       conInput.value = nf10k;
       conInput2.value = nf10k;
+      nonTaxInput.value = '0';
       lastEdited = 'excluded';
       autoCalc();
     }
     document.getElementById('reset_rows').addEventListener('click', resetAll);
     resetAll();
 
-    // 시급 입력 방향 설정
     conInput.addEventListener('input', ()=>{
       lastEdited = 'excluded';
       syncIncludedFromExcluded();
