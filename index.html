@@ -33,6 +33,9 @@
       font-size: 12px; color: #9ca3af; pointer-events: none;
     }
 
+    /* “주총근로시간 / 월총근로시간” 전용 작은 폰트 */
+    .small-text { font-size: 12px; line-height: 1.2; }
+
     /* 모달 */
     .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:50; }
     .modal.show { display:flex; }
@@ -135,8 +138,16 @@
             </tr>
             <tr>
               <th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th><th>일</th>
-              <th>주소정</th><th>월소정</th><th>최저급여</th><th>계약급여</th>
-              <th>주소정</th><th>월소정</th><th>최저급여</th><th>계약급여</th>
+
+              <!-- 여기만 글씨 작게 -->
+              <th class="small-text">주총근로시간</th>
+              <th class="small-text">월총근로시간</th>
+              <th>최저급여</th><th>계약급여</th>
+
+              <!-- 여기만 글씨 작게 -->
+              <th class="small-text">주총근로시간</th>
+              <th class="small-text">월총근로시간</th>
+              <th>최저급여</th><th>계약급여</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -181,20 +192,20 @@
       </div>
       <div class="text-sm text-gray-700 space-y-4">
         <ul class="list-disc pl-5 space-y-1">
-          <li><b>주휴수당</b>: 주 15시간 이상 근무 & 소정근로일 개근 시 발생</li>
+          <li><b>주휴수당</b>: <b>주 15시간 이상 근무</b> & 소정근로일 개근 시 발생</li>
           <li><b>주휴시간</b> = (주간 근로시간 ÷ 40) × 8 (최대 8시간)</li>
-          <li><b>주소정(5인 미만)</b> = 주간 근로시간 + 주휴시간</li>
-          <li><b>주소정(5인 이상)</b> = 
+          <li><b>주총근로시간(5인 미만)</b> = 주간 근로시간 + 주휴시간</li>
+          <li><b>주총근로시간(5인 이상)</b> = 
             <span class="whitespace-pre-line">
-- 일별 초과합 = Σ max(0, h-8)
-- 주40 초과 = max(0, 주간총시간-40)
-- 프리미엄 = 0.5 × max(일별 초과합, 주40 초과)
-- 가산반영 주간근로 = 주간총시간 + 프리미엄
-- 최종 주소정 = 가산반영 주간근로 + 주휴시간</span></li>
-          <li><b>월소정</b> = 주소정 × (365 ÷ 7 ÷ 12) (정수 올림)</li>
-          <li><b>최저급여</b> = 월소정 × 최저시급, <b>계약급여</b> = 월소정 × 계약시급</li>
+일별 연장시간 합계 = Σ max(0, h-8)
+주40 초과 연장시간 = max(0, 주간총시간-40)
+가산시간 = 0.5 × max(일별 연장시간 합계, 주40 초과 연장시간)
+주총근로시간 = 가산반영 주간 근로시간 + 주휴시간</span></li>
+          <li><b>월총근로시간</b> = 주총근로시간 × (365 ÷ 7 ÷ 12) (정수 올림)</li>
+          <li><b>최저급여</b> = 월총근로시간 × 최저시급, 
+          <li><b>계약급여</b> = 월총근로시간 × 계약시급</li>
           <li>최저시급(2025) = <b>10,030원</b></li>
-          <li class="text-gray-500">시급 연동(별도↔포함)은 1안(첫 행) 기준으로 계산됩니다.</li>
+          <li>시급 연동(별도↔포함)은 1안(첫 행) 기준으로 계산됩니다.</li>
         </ul>
       </div>
       <div class="mt-5 flex justify-end gap-2">
@@ -290,20 +301,18 @@
       const eligible = weeklyHours>=15 && workdays>0;
       const weeklyHoliday = eligible ? Math.min((weeklyHours/40)*8,8) : 0;
 
-      // 5인 미만: 주간 표준 = 주간 총시간 + 주휴
+      // 5인 미만: 주총근로시간 = 주간 총시간 + 주휴
       const weeklyStd_u5 = weeklyHours + weeklyHoliday;
 
-      // 5인 이상: 개선 로직
-      // 일별 초과합(>8h), 주40 초과를 각각 계산 후 프리미엄 = 0.5 * max(일별초과합, 주40초과)
+      // 5인 이상: 가산 로직
       const dailyOver = dayHours.reduce((s,h)=> s + Math.max(0, h - 8), 0);
       const weeklyOver = Math.max(0, weeklyHours - 40);
       const premium = 0.5 * Math.max(dailyOver, weeklyOver);
 
-      // 가산 반영 주간 근로시간 + 주휴
       const adjustedWork_o5 = weeklyHours + premium;
       const weeklyStd_o5 = adjustedWork_o5 + weeklyHoliday;
 
-      // 월 소정(정수 올림)
+      // 월총근로시간(정수 올림)
       const monthlyStd_u5 = Math.ceil(weeklyStd_u5 * MONTH_FACTOR);
       const monthlyStd_o5 = Math.ceil(weeklyStd_o5 * MONTH_FACTOR);
 
@@ -380,7 +389,6 @@
       const { monthlyStd } = refStats();
       const included = toInt(conInput2.value);
       if(monthlyStd > 0 && included > 0){
-        // 포함시급을 월 총액으로 환산 후, 5인 미만 표준 월소정으로 나누어 별도시급 역산
         const contractGross = monthlyStd * included;
         const excluded = Math.round(contractGross / monthlyStd);
         conInput.value = excluded ? nf.format(excluded) : '';
@@ -411,9 +419,10 @@
 
     function resetAll(){
       tbody.innerHTML=''; for(let i=0;i<3;i++) addRow(i);
-      minInput.value = nf.format(10030);
-      conInput.value = nf.format(10030);
-      conInput2.value = nf.format(10030);
+      const nf10k = nf.format(10030);
+      minInput.value = nf10k;
+      conInput.value = nf10k;
+      conInput2.value = nf10k;
       lastEdited = 'excluded';
       autoCalc();
     }
