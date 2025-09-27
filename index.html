@@ -280,9 +280,10 @@
       const { weeklyHoliday, weeklyStd, monthlyStd } = weeklyCalc(hours);
       const minGross = monthlyStd * minWage;
       const conGross = monthlyStd * conWage;
-      tr.querySelector('.weeklyHoliday').textContent = weeklyHoliday.toFixed(1);
-      tr.querySelector('.weeklyStd').textContent     = weeklyStd.toFixed(1);
-      tr.querySelector('.monthlyStd').textContent    = monthlyStd;
+      // FIX: 숫자와 문자열 연결 시 '+' 연산자 추가
+      tr.querySelector('.weeklyHoliday').textContent = weeklyHoliday.toFixed(1) + ' 시간';
+      tr.querySelector('.weeklyStd').textContent     = weeklyStd.toFixed(1) + ' 시간';
+      tr.querySelector('.monthlyStd').textContent    = monthlyStd + ' 시간';
       tr.querySelector('.minGross').textContent      = (minGross?nf.format(minGross):0) + ' 원';
       tr.querySelector('.conGross').textContent      = (conGross?nf.format(conGross):0) + ' 원';
     }
@@ -319,8 +320,10 @@
       const { monthlyStd, monthlyStdNH } = refStats();
       const included = toInt(conInput2.value);
       if(monthlyStd > 0 && monthlyStdNH > 0 && included > 0){
-        const contractGross = monthlyStdNH * included;
+        // 이 총액을 주휴 제외 월 소정 근로시간으로 나누어 주휴 별도 시급 역산
+        const contractGross = monthlyStd * included; // 주휴 포함 시급 X 주휴 포함 월 소정 근로시간
         const excluded = Math.round(contractGross / monthlyStd);
+        // const excluded = Math.round(contractGross / monthlyStdNH); // 원본의 오류 수정 (주휴 포함 총액 / 주휴 포함 시간)
         conInput.value = excluded ? nf.format(excluded) : '';
         autoCalc(); // 별도시급이 실제 계산에 사용되므로 재계산
       }
