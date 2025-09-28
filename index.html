@@ -51,7 +51,7 @@
                  class="absolute inset-0 w-full h-full object-cover transition duration-200 group-hover:opacity-90">
           </div>
         </a>
-        <!-- 배너 2 (URL 오타 수정) -->
+        <!-- 배너 2 -->
         <a href="https://www.kdrcash.kr/" target="_blank" rel="noopener noreferrer" class="block group" aria-label="닥터캐시 홈 2">
           <div class="relative w-full aspect-[4/1] rounded-xl overflow-hidden border border-gray-200 shadow-sm">
             <img loading="lazy" decoding="async"
@@ -150,9 +150,11 @@
         </button>
       </div>
 
-      <!-- 특이사항 표기 -->
+      <!-- 특이사항 배지 (세액표 배지와 ID 충돌 방지) -->
       <div class="flex flex-wrap items-center gap-2 mb-3">
-      <span id="table_status" class="badge text-gray-700 border-gray-300 bg-gray-50">계약시급(주휴수당 포함)은 1안과 연동</span>
+        <span id="sync_status" class="badge text-gray-700 border-gray-300 bg-gray-50">
+          계약시급(주휴수당 포함)은 1안과 연동되어 계산
+        </span>
       </div>
 
       <!-- 근로시간표 -->
@@ -209,53 +211,136 @@
     </section>
   </main>
 
-  <!-- Ver 모달 -->
+  <!-- Ver 모달 (정리 버전) -->
   <div id="ver_modal" class="modal" aria-hidden="true">
     <div class="absolute inset-0 bg-black/50"></div>
-    <div role="dialog" aria-modal="true" class="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl p-6">
-      <div class="flex items-start justify-between mb-3">
-        <h3 class="text-lg font-bold text-gray-800">버전 1.4 • 계산 규칙</h3>
-        <button id="ver_close" class="p-2 -m-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="닫기">✕</button>
+    <div role="dialog" aria-modal="true"
+         class="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl p-6">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-gray-900">버전 1.4 • 계산 규칙</h3>
+          <p class="text-xs text-gray-500 mt-1">2025-09 기준 / 내부 검증용 가이드</p>
+        </div>
+        <button id="ver_close"
+                class="p-2 -m-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="닫기">✕</button>
       </div>
-      <div class="text-sm text-gray-700 space-y-4">
-        <ul class="list-disc pl-5 space-y-1">
-          <li>주휴수당: 주 15시간 이상 & 소정근로일 개근 시 발생</li>
-          <li>주휴시간 = (주간 근로시간 ÷ 40) × 8 (최대 8시간)</li>
-          <li>5인 미만: 주총 = 주간 + 주휴</li>
-          <li>5인 이상: 가산시간 = 0.5×max(Σmax(0,h-8), max(0,주간-40)); 주총 = (주간+가산)+주휴</li>
-          <li>월총근로시간 = 주총 × (365 ÷ 7 ÷ 12) (정수 올림)</li>
-          <li>최저급여(세후) 비과세 0 가정, 계약급여(세후)는 입력 비과세 반영(미입력 시 0)</li>
-          <li>계약시급 유형(세전/세후) 선택 가능(세후는 실수령→세전 역산)</li>
-          <li>간이세액표 2024 1인 기준, 10원 절사, 장기요양=건보×12.95%, 연금/건보 상·하한, 비과세 제외</li>
-          <li>시급 연동(별도↔포함)은 1안(첫 행) 기준, 포함은 5인 미만/이상 각각 제공</li>
-        </ul>
+
+      <div class="text-sm text-gray-800 space-y-5 max-h-[60vh] overflow-y-auto pr-1">
+        <section>
+          <h4 class="font-semibold text-gray-900 mb-2">① 주휴수당 요건</h4>
+          <ul class="list-disc pl-5 space-y-1 text-gray-700">
+            <li>주간 소정근로시간 <b>15시간 이상</b> & 소정근로일 <b>개근</b> 시 발생</li>
+            <li>주휴시간: <span class="font-mono bg-gray-50 px-1.5 py-0.5 rounded">min((주간근로/40)×8, 8)</span></li>
+          </ul>
+        </section>
+
+        <section class="grid sm:grid-cols-2 gap-4">
+          <div class="border rounded-lg p-3">
+            <div class="font-semibold text-gray-900 mb-1">② 5인 미만</div>
+            <ul class="list-disc pl-5 space-y-1 text-gray-700">
+              <li>주총근로시간: <span class="font-mono bg-gray-50 px-1.5 py-0.5 rounded">주간근로 + 주휴</span></li>
+              <li>월총근로시간(정수 올림): <span class="font-mono bg-gray-50 px-1.5 py-0.5 rounded">주총 × (365/7/12)</span></li>
+            </ul>
+          </div>
+          <div class="border rounded-lg p-3">
+            <div class="font-semibold text-gray-900 mb-1">③ 5인 이상</div>
+            <ul class="list-disc pl-5 space-y-1 text-gray-700">
+              <li>일별 초과합: <span class="font-mono bg-gray-50 px-1.5 py-0.5 rounded">Σ max(0, h-8)</span></li>
+              <li>주40 초과: <span class="font-mono bg-gray-50 px-1.5 py-0.5 rounded">max(0, 주간근로-40)</span></li>
+              <li>가산시간: <span class="font-mono bg-gray-50 px-1.5 py-0.5 rounded">0.5 × max(일별 초과합, 주40 초과)</span></li>
+              <li>주총근로시간: <span class="font-mono bg-gray-50 px-1.5 py-0.5 rounded">(주간근로 + 가산시간) + 주휴</span></li>
+              <li>월총근로시간(정수 올림): <span class="font-mono bg-gray-50 px-1.5 py-0.5 rounded">주총 × (365/7/12)</span></li>
+            </ul>
+          </div>
+        </section>
+
+        <section>
+          <h4 class="font-semibold text-gray-900 mb-2">④ 급여·세액 가정</h4>
+          <ul class="list-disc pl-5 space-y-1 text-gray-700">
+            <li>최저급여(세후): 비과세 0 가정</li>
+            <li>계약급여(세후): 입력한 비과세(미입력 시 0) 반영</li>
+            <li>계약시급 유형: <span class="font-mono bg-gray-50 px-1.5 py-0.5 rounded">세전</span> / <span class="font-mono bg-gray-50 px-1.5 py-0.5 rounded">세후(실수령→세전 역산)</span></li>
+            <li>간이세액표 2024 (1인, 10원 절사), 장기요양 = 건보 × 12.95%</li>
+            <li>국민연금·건보 상·하한 및 비과세는 표준 규칙 적용</li>
+          </ul>
+        </section>
+
+        <section class="border-t pt-3">
+          <h4 class="font-semibold text-gray-900 mb-2">⑤ 시급 연동 (별도 ↔ 포함)</h4>
+          <p class="text-gray-700">
+            <span class="font-bold">1안(첫 행)</span>의 근로시간을 기준으로
+            <span class="font-mono bg-gray-50 px-1.5 py-0.5 rounded">주휴 포함 시급</span>을
+            5인 미만/이상 각각 자동 환산합니다.
+          </p>
+        </section>
       </div>
+
       <div class="mt-5 flex justify-end gap-2">
-        <button id="ver_ok" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">확인</button>
+        <button id="ver_ok"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          확인
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- 계약시급 유형 모달 -->
+  <!-- 계약시급 유형 모달 (정리 버전) -->
   <div id="wage_mode_modal" class="modal" aria-hidden="true">
     <div class="absolute inset-0 bg-black/50"></div>
-    <div role="dialog" aria-modal="true" class="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl p-6">
+    <div role="dialog" aria-modal="true"
+         class="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl p-6">
       <div class="flex items-start justify-between mb-3">
-        <h3 class="text-lg font-bold text-gray-800">계약시급 유형 선택</h3>
-        <button id="wage_mode_close" class="p-2 -m-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="닫기">✕</button>
+        <h3 class="text-lg font-bold text-gray-900">계약시급 유형 선택</h3>
+        <button id="wage_mode_close"
+                class="p-2 -m-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="닫기">✕</button>
       </div>
-      <div class="space-y-3 text-sm text-gray-700">
-        <label class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:bg-gray-50">
+
+      <div class="space-y-3 text-sm">
+        <!-- 세전 -->
+        <label class="flex items-start gap-3 p-3 rounded-xl border cursor-pointer hover:bg-gray-50">
           <input type="radio" name="wage_mode" value="gross" class="mt-1.5" checked>
-          <div><div class="font-semibold text-gray-900">세전(기본)</div><div class="text-gray-500">계약시급을 <b>세전 시급</b>으로 간주합니다.</div></div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-gray-900">세전(기본)</span>
+              <span class="text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 border border-gray-200">권장</span>
+            </div>
+            <p class="text-gray-600 mt-1">입력한 계약시급을 <b>세전 시급</b>으로 계산합니다.</p>
+            <p class="text-gray-500 mt-1">예) 월총 182시간 × 10,030원 = 세전 월급 산정 → 공제 차감</p>
+          </div>
         </label>
-        <label class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:bg-gray-50">
+
+        <!-- 세후 -->
+        <label class="flex items-start gap-3 p-3 rounded-xl border cursor-pointer hover:bg-gray-50">
           <input type="radio" name="wage_mode" value="net" class="mt-1.5">
-          <div><div class="font-semibold text-gray-900">세후</div><div class="text-gray-500">행별 <u>월총근로시간 × 계약시급(세후)</u>을 실수령(월)로 보고 <b>세전 월급</b>을 역산합니다.</div></div>
+          <div class="flex-1">
+            <div class="font-semibold text-gray-900">세후</div>
+            <p class="text-gray-600 mt-1">
+              행별 <u>월총근로시간 × 계약시급(세후)</u>을 <b>실수령</b>으로 보고, 세목(간이세액표·4대보험)을 반영해 <b>세전 월급</b>을 역산합니다.
+            </p>
+            <p class="text-gray-500 mt-1">주의: 비과세(월)를 입력하면 역산 결과가 달라질 수 있습니다.</p>
+          </div>
         </label>
+
+        <!-- 안내 배지: 한 줄 고정 -->
+        <div class="mt-2 overflow-x-auto">
+          <span class="inline-flex items-center gap-2 text-[11px] px-2 py-1 rounded-md border border-blue-200 bg-blue-50 text-blue-700 whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 18a6 6 0 110-12 6 6 0 010 12z"/>
+            </svg>
+            <span>
+              계약시급(주휴 포함)은 <b>1안(첫 행)</b> 근로시간과 연동되어 자동 환산됩니다.
+            </span>
+          </span>
+        </div>
       </div>
+
       <div class="mt-5 flex justify-end gap-2">
-        <button id="wage_mode_apply" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">적용</button>
+        <button id="wage_mode_apply"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          적용
+        </button>
       </div>
     </div>
   </div>
