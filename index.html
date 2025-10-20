@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>일할급여 계산기 (Lambda 연동)</title>
+  <title>일할급여 계산기</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; background:#f3f4f6 }
@@ -460,6 +460,29 @@
         return false;
       }
     }
+
+    /* ===== Ver 모달 동작 ===== */
+    function openVerModal(){ EL.verModal.classList.remove('hidden'); EL.verModal.classList.add('flex'); document.body.classList.add('overflow-hidden'); }
+    function closeVerModal(){ EL.verModal.classList.add('hidden'); EL.verModal.classList.remove('flex'); document.body.classList.remove('overflow-hidden'); }
+    EL.verBtn.addEventListener('click', async ()=>{
+      openVerModal();
+      // 서버에서 상·하한/면세 기준을 가져와 라벨 갱신
+      try {
+        const r = await fetch(API_BASE + '/meta');
+        if (r.ok) {
+          const m = await r.json();
+          document.getElementById('np_min_label').textContent = fmt(m.ranges?.np?.min ?? 0);
+          document.getElementById('np_max_label').textContent = fmt(m.ranges?.np?.max ?? 0);
+          document.getElementById('hi_min_label').textContent = fmt(m.ranges?.hi?.min ?? 0);
+          document.getElementById('hi_max_label').textContent = fmt(m.ranges?.hi?.max ?? 0);
+          document.getElementById('tax_zero_label').textContent = fmt(m.taxZeroMonthly ?? 0);
+        }
+      } catch {}
+    });
+    EL.verClose.addEventListener('click', closeVerModal);
+    EL.verOk.addEventListener('click', closeVerModal);
+    EL.verModal.addEventListener('click', (e)=>{ const dialog=EL.verModal.querySelector('[role="dialog"]'); if(!dialog.contains(e.target)) closeVerModal(); });
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeVerModal(); });
 
     /* ===== Lambda 호출 ===== */
     async function apiBatch(items){
