@@ -461,28 +461,35 @@
       }
     }
 
-    /* ===== Ver 모달 동작 ===== */
-    function openVerModal(){ EL.verModal.classList.remove('hidden'); EL.verModal.classList.add('flex'); document.body.classList.add('overflow-hidden'); }
-    function closeVerModal(){ EL.verModal.classList.add('hidden'); EL.verModal.classList.remove('flex'); document.body.classList.remove('overflow-hidden'); }
-    EL.verBtn.addEventListener('click', async ()=>{
-      openVerModal();
-      // 서버에서 상·하한/면세 기준을 가져와 라벨 갱신
-      try {
-        const r = await fetch(API_BASE + '/meta');
-        if (r.ok) {
-          const m = await r.json();
-          document.getElementById('np_min_label').textContent = fmt(m.ranges?.np?.min ?? 0);
-          document.getElementById('np_max_label').textContent = fmt(m.ranges?.np?.max ?? 0);
-          document.getElementById('hi_min_label').textContent = fmt(m.ranges?.hi?.min ?? 0);
-          document.getElementById('hi_max_label').textContent = fmt(m.ranges?.hi?.max ?? 0);
-          document.getElementById('tax_zero_label').textContent = fmt(m.taxZeroMonthly ?? 0);
-        }
-      } catch {}
-    });
-    EL.verClose.addEventListener('click', closeVerModal);
-    EL.verOk.addEventListener('click', closeVerModal);
-    EL.verModal.addEventListener('click', (e)=>{ const dialog=EL.verModal.querySelector('[role="dialog"]'); if(!dialog.contains(e.target)) closeVerModal(); });
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeVerModal(); });
+/* ===== /meta 캐시 + 렌더 ===== */
+let __metaCache = null;
+
+async function getMeta(){
+  if (__metaCache) return __metaCache;
+  const r = await fetch(API_BASE + '/meta', { cache:'no-store' });
+  if (!r.ok) throw new Error('meta HTTP ' + r.status);
+  __metaCache = await r.json();
+  return __metaCache;
+}
+
+function renderMetaLabels(meta){
+  const npMin = meta?.ranges?.np?.min ?? 0;
+  const npMax = meta?.ranges?.np?.max ?? 0;
+  const hiMin = meta?.ranges?.hi?.min ?? 0;
+  const hiMax = meta?.ranges?.hi?.max ?? 0;
+  const taxZero = meta?.taxZeroMonthly ?? 0;
+
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = toWon(val);
+  };
+  set('np_min_label', npMin);
+  set('np_max_label', npMax);
+  set('hi_min_label', hiMin);
+  set('hi_max_label', hiMax);
+  set('tax_zero_label', taxZero);
+}
+
 
     /* ===== Lambda 호출 ===== */
     async function apiBatch(items){
